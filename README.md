@@ -16,6 +16,7 @@ DeskFlow/
 ├── websocket_manager.py     # Gestión de conexiones WebSocket en tiempo real
 ├── seed.py                  # Script para poblar la BD con datos iniciales
 ├── requirements.txt         # Dependencias Python
+├── .gitignore               # Archivos excluidos del control de versiones
 ├── sistema-espacios.html    # Frontend (interfaz web)
 └── routers/
     ├── auth.py              # Endpoints de login/logout
@@ -74,9 +75,15 @@ Lista de dependencias del proyecto:
 | `uvicorn` | Servidor ASGI para ejecutar FastAPI |
 | `sqlalchemy` | ORM para interactuar con la base de datos |
 | `python-jose` | Generación y validación de tokens JWT |
-| `passlib[bcrypt]` | Cifrado seguro de contraseñas |
+| `bcrypt` | Cifrado seguro de contraseñas |
+| `pydantic[email]` | Validación de datos y soporte para campos EmailStr |
 | `python-multipart` | Soporte para formularios en FastAPI |
 | `websockets` | Soporte WebSocket |
+
+> **Nota:** La dependencia original `passlib[bcrypt]` fue eliminada por incompatibilidad con Python 3.13+. El proyecto usa `bcrypt` directamente.
+
+### `.gitignore`
+Excluye del repositorio los archivos generados automáticamente: `__pycache__/`, el entorno virtual `.venv/`, la base de datos local `espacios.db` y ficheros de variables de entorno `.env`.
 
 ### `sistema-espacios.html`
 Frontend completo en un único archivo HTML+CSS+JS. No necesita servidor propio, se abre directamente en el navegador. Incluye:
@@ -105,28 +112,72 @@ CRUD de espacios más dos endpoints especiales:
 
 ---
 
+## Requisitos previos
+
+- **Python 3.10 o superior** (probado en Python 3.14)
+- **Chrome o Edge** para abrir el frontend (recomendado)
+
+Comprueba tu versión de Python:
+```bash
+python --version
+```
+
+---
+
 ## Puesta en marcha
 
-### 1. Crear entorno virtual e instalar dependencias
+### 1. Crear entorno virtual
+
 ```bash
 python -m venv .venv
-.venv\Scripts\activate        # Windows
-source .venv/bin/activate     # Linux/Mac
+```
 
+### 2. Activar el entorno virtual
+
+> ⚠️ Este paso hay que repetirlo cada vez que abras una nueva terminal.
+
+```bash
+# Windows — CMD
+.venv\Scripts\activate.bat
+
+# Windows — PowerShell
+.venv\Scripts\Activate.ps1
+
+# Linux / Mac
+source .venv/bin/activate
+```
+
+Una vez activo verás `(.venv)` al inicio del prompt.
+
+> Si PowerShell da error de permisos, ejecuta primero:
+> ```bash
+> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+> ```
+
+### 3. Instalar dependencias
+
+```bash
 pip install -r requirements.txt
 ```
 
-### 2. Inicializar la base de datos con datos de prueba
+### 4. Inicializar la base de datos con datos de prueba
+
+> Solo se hace una vez.
+
 ```bash
 python seed.py
 ```
 
-### 3. Arrancar el servidor
+### 5. Arrancar el servidor
+
 ```bash
 uvicorn main:app --reload --port 8000
 ```
 
-### 4. Abrir el frontend
+Deja esta terminal abierta mientras usas la app. Para detener el servidor pulsa `Ctrl+C`.
+
+### 6. Abrir el frontend
+
 Abre `sistema-espacios.html` directamente en el navegador (doble clic o arrastrar a Chrome/Edge).
 
 ---
