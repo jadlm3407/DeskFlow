@@ -1,0 +1,12 @@
+# Entorno virtual
+.venv/
+
+# Base de datos
+*.db
+
+# Python - pycache en cualquier carpeta
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
