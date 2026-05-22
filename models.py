@@ -76,8 +76,9 @@ class Space(Base):
     reservation_user_id     = Column(Integer, ForeignKey("users.id"), nullable=True)
     reservation_expires_at  = Column(DateTime(timezone=True), nullable=True)
 
-    zone        = relationship("Zone", back_populates="spaces")
-    occupancies = relationship("Occupancy", back_populates="space")
+    zone               = relationship("Zone", back_populates="spaces")
+    occupancies        = relationship("Occupancy", back_populates="space")
+    device_assignments = relationship("DeviceAssignment", back_populates="space")
 
 
 # ── OCCUPANCIES (log de entradas/salidas) ─────────────────────────────────────
@@ -93,3 +94,36 @@ class Occupancy(Base):
 
     user  = relationship("User", back_populates="occupancies")
     space = relationship("Space", back_populates="occupancies")
+
+
+# ── ENERGY ────────────────────────────────────────────────────────────────────
+
+class DeviceLocationEnum(str, enum.Enum):
+    ceiling = "ceiling"       # techo (iluminación)
+    wall    = "wall"          # pared (enchufes, AC)
+    floor   = "floor"         # suelo (equipos)
+    desk    = "desk"          # mesa (ordenadores, monitores)
+
+
+class Device(Base):
+    __tablename__ = "devices"
+
+    id          = Column(Integer, primary_key=True, index=True)
+    name        = Column(String(100), nullable=False)        # "Fluorescente LED 40W"
+    watts       = Column(Float, nullable=False)              # consumo en vatios
+    location    = Column(Enum(DeviceLocationEnum), nullable=False)
+    description = Column(String(255), nullable=True)
+
+    assignments = relationship("DeviceAssignment", back_populates="device")
+
+
+class DeviceAssignment(Base):
+    __tablename__ = "device_assignments"
+
+    id        = Column(Integer, primary_key=True, index=True)
+    space_id  = Column(Integer, ForeignKey("spaces.id"), nullable=False)
+    device_id = Column(Integer, ForeignKey("devices.id"), nullable=False)
+    quantity  = Column(Integer, default=1)
+
+    space  = relationship("Space", back_populates="device_assignments")
+    device = relationship("Device", back_populates="assignments")
