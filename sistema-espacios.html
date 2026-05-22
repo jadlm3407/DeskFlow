@@ -26,29 +26,39 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 @keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes nfcPulse{0%{transform:scale(1);opacity:1}50%{transform:scale(1.08);opacity:.7}100%{transform:scale(1);opacity:1}}
+@keyndef ripple{0%{transform:scale(0.8);opacity:0.6}100%{transform:scale(2.2);opacity:0}}
 
-/* ── LOGIN ── */
-#view-login{align-items:center;justify-content:center;background:var(--bg);position:relative;}
-.login-blob{position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(74,140,80,.12) 0%,transparent 70%);top:-100px;right:-100px;pointer-events:none;}
-.login-logo{position:absolute;top:28px;left:36px;display:flex;align-items:center;gap:9px;}
-.login-logo-icon{width:30px;height:30px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;}
-.login-logo-text{font-weight:700;font-size:15px;letter-spacing:-.3px;}
-.login-logo-text span{color:var(--text-2);font-weight:400;}
-.login-time{position:absolute;top:34px;right:36px;font-family:var(--mono);font-size:12px;color:var(--text-3);}
-.login-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:36px 32px;width:360px;box-shadow:0 8px 32px rgba(0,0,0,.08);animation:slideUp .4s cubic-bezier(.16,1,.3,1) both;}
-.login-eyebrow{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-2);margin-bottom:6px;}
-.login-title{font-size:22px;font-weight:700;letter-spacing:-.5px;margin-bottom:4px;}
-.login-subtitle{font-size:13px;color:var(--text-2);margin-bottom:28px;}
-.field{margin-bottom:14px;}
-.field label{display:block;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px;}
-.field input{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-sm);color:var(--text);font-family:var(--mono);font-size:13px;padding:10px 14px;outline:none;transition:border-color .2s,box-shadow .2s;}
-.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(61,90,62,.12);}
-.field input::placeholder{color:var(--text-3);}
-.login-btn{width:100%;margin-top:20px;background:var(--accent);border:none;border-radius:var(--r-sm);color:#fff;font-family:var(--font);font-size:13px;font-weight:600;padding:11px;cursor:pointer;transition:background .2s,transform .1s,box-shadow .2s;}
-.login-btn:hover{background:var(--accent-2);box-shadow:0 4px 16px rgba(61,90,62,.3);}
-.login-btn:active{transform:scale(.98);}
-.login-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
-.login-error{margin-top:10px;font-size:12px;color:var(--red);text-align:center;min-height:18px;font-weight:500;}
+/* ── KIOSKO ── */
+#view-kiosko{align-items:center;justify-content:center;background:var(--bg);position:relative;overflow:hidden;}
+.kiosko-blob1{position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(74,140,80,.10) 0%,transparent 70%);top:-150px;right:-150px;pointer-events:none;}
+.kiosko-blob2{position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(74,140,80,.07) 0%,transparent 70%);bottom:-100px;left:-100px;pointer-events:none;}
+.kiosko-logo{position:absolute;top:28px;left:36px;display:flex;align-items:center;gap:9px;}
+.kiosko-logo-icon{width:30px;height:30px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;}
+.kiosko-logo-text{font-weight:700;font-size:15px;letter-spacing:-.3px;}
+.kiosko-logo-text span{color:var(--text-2);font-weight:400;}
+.kiosko-clock{position:absolute;top:34px;right:36px;font-family:var(--mono);font-size:13px;color:var(--text-3);}
+.kiosko-card{display:flex;flex-direction:column;align-items:center;gap:32px;animation:slideUp .5s cubic-bezier(.16,1,.3,1) both;}
+.nfc-ring-wrap{position:relative;width:180px;height:180px;display:flex;align-items:center;justify-content:center;}
+.nfc-ring{position:absolute;border-radius:50%;border:2px solid var(--green-bd);animation:nfcPulse 2s ease-in-out infinite;}
+.nfc-ring:nth-child(1){width:180px;height:180px;animation-delay:0s;opacity:.3;}
+.nfc-ring:nth-child(2){width:140px;height:140px;animation-delay:.3s;opacity:.5;}
+.nfc-ring:nth-child(3){width:100px;height:100px;animation-delay:.6s;opacity:.7;}
+.nfc-icon-circle{width:72px;height:72px;background:var(--green-bg);border:2px solid var(--green-bd);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 4px 20px rgba(74,140,80,.2);position:relative;z-index:1;}
+.kiosko-title{font-size:28px;font-weight:700;letter-spacing:-.5px;text-align:center;line-height:1.2;}
+.kiosko-subtitle{font-size:15px;color:var(--text-2);text-align:center;max-width:320px;line-height:1.6;}
+.kiosko-status{display:flex;align-items:center;gap:8px;padding:8px 18px;border-radius:99px;background:var(--surface);border:1px solid var(--border2);font-size:12px;color:var(--text-2);font-weight:500;}
+.kiosko-status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite;}
+.kiosko-status-dot.waiting{background:var(--amber);}
+.kiosko-detected{display:none;flex-direction:column;align-items:center;gap:16px;animation:slideUp .4s cubic-bezier(.16,1,.3,1) both;}
+.kiosko-detected.show{display:flex;}
+.kiosko-card.hide{display:none;}
+.detected-avatar{width:72px;height:72px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;box-shadow:0 4px 20px rgba(61,90,62,.3);}
+.detected-name{font-size:24px;font-weight:700;letter-spacing:-.4px;}
+.detected-role{font-size:13px;color:var(--accent-2);font-weight:600;text-transform:uppercase;letter-spacing:.06em;}
+.detected-msg{font-size:14px;color:var(--text-2);}
+.detected-btn{margin-top:8px;background:var(--accent);border:none;border-radius:var(--r-sm);color:#fff;font-family:var(--font);font-size:14px;font-weight:600;padding:12px 32px;cursor:pointer;transition:background .2s,box-shadow .2s;}
+.detected-btn:hover{background:var(--accent-2);box-shadow:0 4px 16px rgba(61,90,62,.3);}
 
 /* ── SCAN / LOADING ── */
 .scanning-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(242,239,232,.92);backdrop-filter:blur(16px);align-items:center;justify-content:center;flex-direction:column;gap:20px;}
@@ -87,8 +97,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 /* ── DASHBOARD ── */
 #view-dashboard{background:var(--bg);}
 .dash-body{padding:20px 28px;display:flex;flex-direction:column;gap:16px;}
-
-/* Stats */
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.04);animation:fadeUp .4s cubic-bezier(.16,1,.3,1) both;transition:box-shadow .2s;}
 .stat-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);}
@@ -98,8 +106,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .stat-val{font-size:24px;font-weight:700;letter-spacing:-.5px;line-height:1;}
 .stat-val.g{color:var(--green);}.stat-val.r{color:var(--red);}.stat-val.a{color:var(--amber);}.stat-val.b{color:#2A5F8A;}
 .stat-lbl{font-size:11px;font-weight:500;color:var(--text-2);margin-top:4px;}
-
-/* Grid */
 .main-grid{display:grid;grid-template-columns:1fr 360px;gap:16px;}
 .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);animation:fadeUp .4s cubic-bezier(.16,1,.3,1) both;}
 #panel-map{animation-delay:.12s;}#panel-availability{animation-delay:.18s;}
@@ -109,8 +115,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .floor-tabs{display:flex;gap:3px;background:var(--surface2);border-radius:var(--r-sm);border:1px solid var(--border);padding:3px;}
 .floor-tab{padding:4px 12px;border-radius:6px;border:none;background:transparent;color:var(--text-2);font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;}
 .floor-tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.1);}
-
-/* ── ZONAS COLAPSADAS ── */
 .map-body{padding:16px;background:var(--surface);}
 .fp-zones-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
 .zone-tile{border-radius:11px;padding:14px 14px 12px;cursor:pointer;position:relative;transition:transform .15s,box-shadow .15s;border:1.5px solid;}
@@ -126,8 +130,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .zone-tile-fill{height:100%;border-radius:99px;}
 .av .zone-tile-fill{background:var(--green);}.pt .zone-tile-fill{background:var(--amber);}.oc .zone-tile-fill{background:var(--red);}
 .zone-tile-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px;color:rgba(0,0,0,.2);}
-
-/* ── ZONA EXPANDIDA ── */
 .zone-full{display:none;flex-direction:column;min-height:400px;}
 .zone-full.show{display:flex;}
 .zf-header{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0;}
@@ -141,30 +143,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .zf-legend{display:flex;gap:12px;padding:9px 16px;border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;}
 .zf-leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-2);}
 .zf-leg-sq{width:10px;height:10px;border-radius:3px;}
-
-/* Miniplan open area */
 .miniplan{background:var(--bg);padding:16px;overflow-y:auto;}
 .mp-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
 .mp-aisle{height:16px;margin:4px 0 10px;display:flex;align-items:center;gap:6px;}
 .mp-aisle-line{flex:1;height:1px;border-top:1px dashed var(--border2);}
 .mp-aisle-label{font-size:9px;color:var(--text-3);letter-spacing:.06em;flex-shrink:0;}
-
-/* Escritorio */
 .desk-unit{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;position:relative;}
 .desk-top{width:50px;height:32px;border-radius:6px;border:1.5px solid;position:relative;transition:transform .12s;}
 .desk-unit:hover .desk-top{transform:scale(1.07);}
 .desk-monitor{position:absolute;top:5px;left:50%;transform:translateX(-50%);width:17px;height:12px;border-radius:2px;border:1.5px solid rgba(0,0,0,.12);}
 .desk-chair{width:26px;height:11px;border-radius:3px 3px 6px 6px;border:1.5px solid;}
 .desk-num{font-size:9px;color:var(--text-3);margin-top:1px;}
-
 .desk-unit.free .desk-top{background:#B8DEC0;border-color:#82B88A;box-shadow:0 4px 0 #5A9060;}
 .desk-unit.free .desk-monitor{background:#6AAF78;}
 .desk-unit.free .desk-chair{background:#8EC498;border-color:#5A9060;box-shadow:0 2px 0 rgba(60,130,70,.3);}
 .desk-unit.taken .desk-top{background:#F0AAAA;border-color:#C07070;box-shadow:0 4px 0 #A05050;}
 .desk-unit.taken .desk-monitor{background:#C05050;}
 .desk-unit.taken .desk-chair{background:#D48080;border-color:#A05050;box-shadow:0 2px 0 rgba(160,60,60,.3);}
-
-/* Sala de reuniones expandida */
 .meeting-full{background:var(--bg);padding:16px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;}
 .meeting-status-bar{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;border:1.5px solid;}
 .meeting-status-bar.av{background:var(--green-bg);border-color:var(--green-bd);}
@@ -173,7 +168,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .av .ms-dot{background:var(--green);}.oc .ms-dot{background:var(--red);}
 .ms-name{font-size:13px;font-weight:600;color:var(--text);}
 .ms-cap{font-size:11px;color:var(--text-2);margin-top:2px;}
-
 .meeting-label{font-size:11px;font-weight:600;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;}
 .meeting-chairs{display:flex;gap:10px;flex-wrap:wrap;}
 .mchair{display:flex;flex-direction:column;align-items:center;gap:3px;}
@@ -187,11 +181,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .mchair.taken .mchair-top{background:#F0AAAA;border-color:#C07070;box-shadow:0 3px 0 #A05050;}
 .mchair.taken .mchair-mon{background:#C05050;}
 .mchair.taken .mchair-bot{background:#D48080;border-color:#A05050;box-shadow:0 2px 0 rgba(160,60,60,.25);}
-
 .manage-btn{padding:10px 14px;border-radius:9px;border:1.5px solid var(--green-bd);background:var(--green-bg);color:var(--green);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;width:100%;transition:background .2s;}
 .manage-btn:hover{background:#C6E6CA;}
-
-/* ── AVAILABILITY PANEL ── */
 .avail-body{padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;max-height:calc(100vh - 210px);}
 .floor-group-title{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3);padding:4px 0;display:flex;align-items:center;gap:8px;margin-top:4px;}
 .floor-group-title::after{content:'';flex:1;height:1px;background:var(--border);}
@@ -208,8 +199,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .az-bar{height:3px;border-radius:99px;background:var(--surface3);margin-top:7px;overflow:hidden;}
 .az-fill{height:100%;border-radius:99px;transition:width .4s;}
 .av .az-fill{background:var(--green);}.pt .az-fill{background:var(--amber);}.oc .az-fill{background:var(--red);}
-
-/* ── MODAL ── */
 .modal-backdrop{display:none;position:fixed;inset:0;z-index:600;background:rgba(30,28,24,.5);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;}
 .modal-backdrop.active{display:flex;}
 .space-modal{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.15);animation:modalIn .3s cubic-bezier(.16,1,.3,1) both;}
@@ -246,37 +235,54 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .btn-checkout:hover:not(:disabled){background:#EEC8C8;}
 .modal-feedback{text-align:center;font-size:12px;font-weight:500;min-height:18px;}
 .modal-feedback.ok{color:var(--green);}.modal-feedback.err{color:var(--red);}
-
-/* ── TOOLTIP ── */
 #desk-tooltip{display:none;position:fixed;z-index:700;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.12);min-width:130px;}
 #desk-tooltip.show{display:block;}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div class="view active" id="view-login">
-  <div class="login-blob"></div>
-  <div class="login-logo">
-    <div class="login-logo-icon">🏢</div>
-    <div class="login-logo-text">DeskFlow <span>Espacios</span></div>
+<!-- KIOSKO -->
+<div class="view active" id="view-kiosko">
+  <div class="kiosko-blob1"></div>
+  <div class="kiosko-blob2"></div>
+  <div class="kiosko-logo">
+    <div class="kiosko-logo-icon">🏢</div>
+    <div class="kiosko-logo-text">DeskFlow <span>Espacios</span></div>
   </div>
-  <div class="login-time" id="clock-login"></div>
-  <div class="login-card">
-    <div class="login-eyebrow">Portal de acceso</div>
-    <div class="login-title">Bienvenido</div>
-    <div class="login-subtitle">Inicia sesión para gestionar los espacios</div>
-    <div class="field"><label>DNI / Identificador</label><input id="input-dni" type="text" placeholder="12345678X" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"></div>
-    <div class="field"><label>Contraseña</label><input id="input-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
-    <button class="login-btn" id="login-btn" onclick="doLogin()">Entrar al sistema</button>
-    <div class="login-error" id="login-error"></div>
+  <div class="kiosko-clock" id="clock-kiosko"></div>
+
+  <!-- Pantalla de espera -->
+  <div class="kiosko-card" id="kiosko-wait">
+    <div class="nfc-ring-wrap">
+      <div class="nfc-ring"></div>
+      <div class="nfc-ring"></div>
+      <div class="nfc-ring"></div>
+      <div class="nfc-icon-circle">📡</div>
+    </div>
+    <div>
+      <div class="kiosko-title">Acerca tu tarjeta NFC</div>
+      <div class="kiosko-subtitle" style="margin-top:8px;">Identifícate para acceder al sistema de gestión de espacios</div>
+    </div>
+    <div class="kiosko-status">
+      <div class="kiosko-status-dot" id="kiosko-dot"></div>
+      <span id="kiosko-status-txt">Esperando tarjeta…</span>
+    </div>
+  </div>
+
+  <!-- Pantalla de usuario detectado -->
+  <div class="kiosko-detected" id="kiosko-detected">
+    <div class="detected-avatar" id="det-avatar">?</div>
+    <div class="detected-name" id="det-name">—</div>
+    <div class="detected-role" id="det-role">—</div>
+    <div class="detected-msg">Tarjeta detectada correctamente</div>
+    <button class="detected-btn" onclick="enterDashboard()">Entrar al sistema →</button>
   </div>
 </div>
 
 <!-- SCAN -->
 <div class="scanning-overlay" id="scanning-overlay">
   <div class="spinner"></div>
-  <div class="scan-text" id="scan-text">Autenticando…</div>
+  <div class="scan-text" id="scan-text">Identificando…</div>
   <div class="scan-progress"><div class="scan-bar" id="scan-bar"></div></div>
 </div>
 
@@ -316,9 +322,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
       <div class="stat-card"><div class="stat-icon b">📍</div><div><div class="stat-val b" id="stat-total">—</div><div class="stat-lbl">Total espacios</div></div></div>
       <div class="stat-card"><div class="stat-icon a">📊</div><div><div class="stat-val a" id="stat-pct">—</div><div class="stat-lbl">Ocupación global</div></div></div>
     </div>
-
     <div class="main-grid">
-      <!-- MAP PANEL -->
       <div class="panel" id="panel-map">
         <div class="panel-head" id="map-head">
           <div><div class="panel-title" id="map-title">Planta baja</div><div class="panel-sub">Selecciona una zona para ver el detalle</div></div>
@@ -327,9 +331,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
             <button class="floor-tab" onclick="switchFloor('primera',this)">1ª Planta</button>
           </div>
         </div>
-        <!-- Zonas colapsadas -->
         <div class="map-body" id="zones-collapsed"><div class="fp-zones-grid" id="fp-zones-grid"></div></div>
-        <!-- Zona expandida -->
         <div class="zone-full" id="zone-full">
           <div class="zf-header">
             <button class="zf-back" onclick="closeZone()">← Volver</button>
@@ -343,8 +345,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
           <div id="zf-body"></div>
         </div>
       </div>
-
-      <!-- AVAILABILITY PANEL -->
       <div class="panel" id="panel-availability">
         <div class="panel-head"><div><div class="panel-title">Disponibilidad</div><div class="panel-sub">Por zonas en tiempo real</div></div></div>
         <div class="avail-body" id="avail-body"></div>
@@ -382,7 +382,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
   </div>
 </div>
 
-<!-- TOOLTIP -->
 <div id="desk-tooltip">
   <div style="font-weight:600;color:var(--text);margin-bottom:4px;" id="dt-name"></div>
   <div style="display:flex;justify-content:space-between;gap:16px;font-size:11px;color:var(--text-2);">
@@ -392,10 +391,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 
 <script>
 const API='http://localhost:8000', WS='ws://localhost:8000/ws';
-let token=null,currentUser=null,currentFloor='baja';
-let sessionStart=null,sessionInterval=null,ws=null;
-let spacesCache={},zonesCache={};
-let modalSpaceId=null,modalTimerIv=null,openZoneId=null;
+let token=null, currentUser=null, currentFloor='baja';
+let sessionStart=null, sessionInterval=null, ws=null;
+let spacesCache={}, zonesCache={};
+let modalSpaceId=null, modalTimerIv=null, openZoneId=null;
+let pollingInterval=null;
 
 function $$(id){return document.getElementById(id);}
 function pad(n){return String(n).padStart(2,'0');}
@@ -403,7 +403,7 @@ function pad(n){return String(n).padStart(2,'0');}
 /* CLOCK */
 function tick(){
   const s=new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  ['clock-login','clock-dash'].forEach(id=>{const el=$$(id);if(el)el.textContent=s;});
+  ['clock-kiosko','clock-dash'].forEach(id=>{const el=$$(id);if(el)el.textContent=s;});
 }
 setInterval(tick,1000);tick();
 
@@ -413,27 +413,48 @@ function updateSession(){
   el.textContent=`Sesión: ${pad(Math.floor(s/60))}:${pad(s%60)}`;
 }
 
-/* AUTH */
-async function doLogin(){
-  const dni=$$('input-dni').value.trim(),pass=$$('input-pass').value;
-  const errEl=$$('login-error'),btn=$$('login-btn');
-  errEl.textContent='';
-  if(!dni||!pass){errEl.textContent='Introduce DNI y contraseña';return;}
-  btn.disabled=true;btn.textContent='Verificando…';
-  try{
-    const res=await fetch(`${API}/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({dni,password:pass})});
-    const data=await res.json();
-    if(!res.ok)throw new Error(data.detail||'Error de autenticación');
-    token=data.access_token;currentUser=data.user;
-    playScan(showDashboard);
-  }catch(e){errEl.textContent=e.message;btn.disabled=false;btn.textContent='Entrar al sistema';}
+/* ── POLLING NFC ─────────────────────────────────────────────────────────── */
+function startPolling(){
+  if(pollingInterval) return;
+  pollingInterval = setInterval(checkNfcPending, 2000);
 }
 
+function stopPolling(){
+  clearInterval(pollingInterval);
+  pollingInterval = null;
+}
+
+async function checkNfcPending(){
+  try{
+    const res = await fetch(`${API}/nfc/pending`);
+    const data = await res.json();
+    if(data.available && data.access_token){
+      stopPolling();
+      token = data.access_token;
+      currentUser = data.user;
+      showDetected(data.user);
+    }
+  }catch(_){}
+}
+
+function showDetected(user){
+  $$('kiosko-wait').classList.add('hide');
+  $$('det-avatar').textContent = user.nombre[0].toUpperCase();
+  $$('det-name').textContent = `${user.nombre} ${user.apellidos}`;
+  $$('det-role').textContent = user.role;
+  $$('kiosko-detected').classList.add('show');
+}
+
+function enterDashboard(){
+  playScan(showDashboard);
+}
+
+/* ── AUTH ─────────────────────────────────────────────────────────────────── */
 function playScan(cb){
   const ov=$$('scanning-overlay');ov.classList.add('active');
   const bar=$$('scan-bar'),txt=$$('scan-text');
   let pct=0;
-  const msgs=[[0,'Autenticando…'],[30,'Verificando credenciales…'],[60,'Cargando datos…'],[85,'Acceso concedido']];
+  const msgs=[[0,'Identificando…'],[30,'Verificando acceso…'],[60,'Cargando espacios…'],[85,'Acceso concedido']];
   const iv=setInterval(()=>{
     pct=Math.min(pct+Math.random()*4+1.5,100);
     bar.style.width=pct+'%';
@@ -445,21 +466,29 @@ function playScan(cb){
 async function showDashboard(){
   const u=currentUser;
   $$('user-nombre').textContent=`${u.nombre} ${u.apellidos}`;
-  $$('user-dni').textContent=u.dni;$$('user-role').textContent=u.role;
+  $$('user-dni').textContent=u.dni;
+  $$('user-role').textContent=u.role;
   $$('user-avatar').textContent=u.nombre[0].toUpperCase();
-  $$('view-login').classList.remove('active');$$('view-dashboard').classList.add('active');
+  $$('view-kiosko').classList.remove('active');
+  $$('view-dashboard').classList.add('active');
   sessionStart=Date.now();sessionInterval=setInterval(updateSession,1000);
   await loadData();connectWS();
 }
 
 async function doLogout(){
   try{await apiFetch('/auth/logout',{method:'POST'});}catch(_){}
-  clearInterval(sessionInterval);token=null;currentUser=null;spacesCache={};zonesCache={};
+  clearInterval(sessionInterval);
+  token=null;currentUser=null;spacesCache={};zonesCache={};
   if(ws){ws.close();ws=null;}setWsDot('off');
-  $$('view-dashboard').classList.remove('active');$$('view-login').classList.add('active');
-  $$('input-pass').value='';$$('login-error').textContent='';
-  $$('login-btn').disabled=false;$$('login-btn').textContent='Entrar al sistema';
-  $$('scan-bar').style.width='0%';$$('scan-text').textContent='Autenticando…';$$('scan-text').className='scan-text';
+  $$('view-dashboard').classList.remove('active');
+  $$('view-kiosko').classList.add('active');
+  // Resetear kiosko
+  $$('kiosko-wait').classList.remove('hide');
+  $$('kiosko-detected').classList.remove('show');
+  $$('scan-bar').style.width='0%';
+  $$('scan-text').textContent='Identificando…';
+  $$('scan-text').className='scan-text';
+  startPolling();
 }
 
 async function apiFetch(path,opts={}){
@@ -515,7 +544,6 @@ function setWsDot(state){
   const[cls,txt]=m[state]||['',''];if(cls)dot.classList.add(cls);lbl.textContent=txt;
 }
 
-/* STATS */
 function updateStats(){
   const sp=Object.values(spacesCache);
   const free=sp.filter(s=>s.status==='available').length;
@@ -526,7 +554,6 @@ function updateStats(){
   $$('stat-total').textContent=sp.length;$$('stat-pct').textContent=(cap?Math.round(occT/cap*100):0)+'%';
 }
 
-/* ZONE STATUS */
 function zoneSt(z){
   if(z.available===0&&z.total_spaces>0)return'oc';
   if(z.occupancy_pct>=30)return'pt';
@@ -534,7 +561,6 @@ function zoneSt(z){
 }
 const ST_TILE={av:'Libre',pt:'Parcial',oc:'Ocupado'};
 
-/* AVAILABILITY PANEL */
 function buildAvailability(){
   const c=$$('avail-body');c.innerHTML='';
   const groups={};
@@ -560,12 +586,11 @@ function buildAvailability(){
   });
 }
 
-/* FLOOR PLAN */
 function buildFloorPlan(floor){
   const grid=$$('fp-zones-grid');grid.innerHTML='';
   $$('map-title').textContent=floor==='baja'?'Planta baja':'Primera planta';
   const zones=Object.values(zonesCache).filter(z=>z.floor===floor);
-  if(!zones.length){grid.innerHTML='<div style="color:var(--text-3);font-size:12px;padding:20px;">Sin datos — ejecuta seed.py</div>';return;}
+  if(!zones.length){grid.innerHTML='<div style="color:var(--text-3);font-size:12px;padding:20px;">Sin datos</div>';return;}
   zones.forEach(z=>{
     const st=zoneSt(z),pct=Math.round(z.occupancy_pct);
     const isMeeting=z.total_spaces<=6;
@@ -580,7 +605,6 @@ function buildFloorPlan(floor){
   });
 }
 
-/* ABRIR ZONA */
 function openZoneById(zoneId){
   const z=zonesCache[zoneId];if(!z)return;
   openZoneId=zoneId;
@@ -597,7 +621,7 @@ function refreshZoneDetail(z){
   const body=$$('zf-body');body.innerHTML='';
   const spaces=Object.values(spacesCache).filter(s=>s.zone_id===z.id);
   const isMeeting=spaces.length>0&&spaces.length<=6&&(spaces[0]?.capacity||0)<=10;
-  if(isMeeting||z.total_spaces<=6) renderMeetingDetail(body,z,spaces,st);
+  if(isMeeting||z.total_spaces<=6)renderMeetingDetail(body,z,spaces,st);
   else renderOpenAreaDetail(body,z,spaces);
 }
 
@@ -747,6 +771,9 @@ async function doCheckout(){
     if(openZoneId){const z=zonesCache[openZoneId];if(z)refreshZoneDetail(z);}
   }catch(e){setFeedback(e.message,'err');$$('btn-checkout').disabled=false;}
 }
+
+/* Iniciar polling al cargar */
+startPolling();
 </script>
 </body>
 </html>

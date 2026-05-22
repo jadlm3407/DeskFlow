@@ -40,6 +40,7 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     occupancies = relationship("Occupancy", back_populates="user")
+    nfc_cards   = relationship("NfcCard", back_populates="user")
 
 
 # ── ZONES ─────────────────────────────────────────────────────────────────────
@@ -47,7 +48,7 @@ class Zone(Base):
     __tablename__ = "zones"
 
     id          = Column(Integer, primary_key=True, index=True)
-    code        = Column(String(10), unique=True, nullable=False)   # ZA, ZB, ZC...
+    code        = Column(String(10), unique=True, nullable=False)
     name        = Column(String(100), nullable=False)
     floor       = Column(Enum(FloorEnum), nullable=False)
     description = Column(String(255), nullable=True)
@@ -60,19 +61,17 @@ class Space(Base):
     __tablename__ = "spaces"
 
     id          = Column(Integer, primary_key=True, index=True)
-    code        = Column(String(10), nullable=False)                # A1, A2, P1...
-    label       = Column(String(150), nullable=False)               # "A1 - SALA REUNIONES"
+    code        = Column(String(10), nullable=False)
+    label       = Column(String(150), nullable=False)
     zone_id     = Column(Integer, ForeignKey("zones.id"), nullable=False)
     capacity    = Column(Integer, default=0)
     status      = Column(Enum(StatusEnum), default=StatusEnum.available)
-    occupancy   = Column(Integer, default=0)                        # personas actuales
-    # posición visual para el mapa (%)
+    occupancy   = Column(Integer, default=0)
     pos_x       = Column(Float, default=0)
     pos_y       = Column(Float, default=0)
     pos_w       = Column(Float, default=10)
     pos_h       = Column(Float, default=10)
     updated_at              = Column(DateTime(timezone=True), onupdate=func.now(), server_default=func.now())
-    # Reserva temporal
     reservation_user_id     = Column(Integer, ForeignKey("users.id"), nullable=True)
     reservation_expires_at  = Column(DateTime(timezone=True), nullable=True)
 
@@ -81,7 +80,7 @@ class Space(Base):
     device_assignments = relationship("DeviceAssignment", back_populates="space")
 
 
-# ── OCCUPANCIES (log de entradas/salidas) ─────────────────────────────────────
+# ── OCCUPANCIES ───────────────────────────────────────────────────────────────
 class Occupancy(Base):
     __tablename__ = "occupancies"
 
@@ -96,21 +95,34 @@ class Occupancy(Base):
     space = relationship("Space", back_populates="occupancies")
 
 
-# ── ENERGY ────────────────────────────────────────────────────────────────────
+# ── NFC CARDS ─────────────────────────────────────────────────────────────────
+class NfcCard(Base):
+    __tablename__ = "nfc_cards"
 
+    id         = Column(Integer, primary_key=True, index=True)
+    uid        = Column(String(50), unique=True, nullable=False)  # UID de la tarjeta
+    user_id    = Column(Integer, ForeignKey("users.id"), nullable=False)
+    label      = Column(String(100), nullable=True)               # ej: "Tarjeta principal"
+    is_active  = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("User", back_populates="nfc_cards")
+
+
+# ── ENERGY ────────────────────────────────────────────────────────────────────
 class DeviceLocationEnum(str, enum.Enum):
-    ceiling = "ceiling"       # techo (iluminación)
-    wall    = "wall"          # pared (enchufes, AC)
-    floor   = "floor"         # suelo (equipos)
-    desk    = "desk"          # mesa (ordenadores, monitores)
+    ceiling = "ceiling"
+    wall    = "wall"
+    floor   = "floor"
+    desk    = "desk"
 
 
 class Device(Base):
     __tablename__ = "devices"
 
     id          = Column(Integer, primary_key=True, index=True)
-    name        = Column(String(100), nullable=False)        # "Fluorescente LED 40W"
-    watts       = Column(Float, nullable=False)              # consumo en vatios
+    name        = Column(String(100), nullable=False)
+    watts       = Column(Float, nullable=False)
     location    = Column(Enum(DeviceLocationEnum), nullable=False)
     description = Column(String(255), nullable=True)
 
