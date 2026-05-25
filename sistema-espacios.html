@@ -96,31 +96,34 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .stat-val{font-size:24px;font-weight:700;letter-spacing:-.5px;line-height:1;}
 .stat-val.g{color:var(--green);}.stat-val.r{color:var(--red);}.stat-val.a{color:var(--amber);}.stat-val.b{color:#2A5F8A;}
 .stat-lbl{font-size:11px;font-weight:500;color:var(--text-2);margin-top:4px;}
-.main-grid{display:grid;grid-template-columns:1fr 360px;gap:16px;}
+
+/* ── PANEL ── */
+.main-grid{display:grid;grid-template-columns:1fr 320px;gap:16px;}
 .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);animation:fadeUp .4s cubic-bezier(.16,1,.3,1) both;}
-#panel-map{animation-delay:.12s;}#panel-availability{animation-delay:.18s;}
 .panel-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 12px;border-bottom:1px solid var(--border);}
 .panel-title{font-size:13px;font-weight:600;letter-spacing:-.2px;}
 .panel-sub{font-size:11px;color:var(--text-3);margin-top:2px;}
-.floor-tabs{display:flex;gap:3px;background:var(--surface2);border-radius:var(--r-sm);border:1px solid var(--border);padding:3px;}
-.floor-tab{padding:4px 12px;border-radius:6px;border:none;background:transparent;color:var(--text-2);font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;}
-.floor-tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.1);}
-.map-body{padding:16px;background:var(--surface);}
-.fp-zones-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
-.zone-tile{border-radius:11px;padding:14px 14px 12px;cursor:pointer;position:relative;transition:transform .15s,box-shadow .15s;border:1.5px solid;}
-.zone-tile:hover{transform:translateY(-3px);}
+
+/* ── ZONA TILE ── */
+.map-body{padding:20px;}
+.zone-tile{border-radius:12px;padding:18px 20px;cursor:pointer;position:relative;transition:transform .15s,box-shadow .15s;border:1.5px solid;display:flex;align-items:center;gap:16px;}
+.zone-tile:hover{transform:translateY(-2px);}
 .zone-tile.av{background:var(--green-bg);border-color:var(--green-bd);box-shadow:0 4px 0 var(--green-sh);}
 .zone-tile.pt{background:var(--amber-bg);border-color:var(--amber-bd);box-shadow:0 4px 0 var(--amber-sh);}
 .zone-tile.oc{background:var(--red-bg);border-color:var(--red-bd);box-shadow:0 4px 0 var(--red-sh);}
-.zone-tile-icon{font-size:20px;margin-bottom:6px;}
-.zone-tile-name{font-size:12px;font-weight:600;color:var(--text);line-height:1.3;}
-.zone-tile-meta{font-size:11px;margin-top:3px;}
+.zone-tile-icon{font-size:28px;flex-shrink:0;}
+.zone-tile-info{flex:1;}
+.zone-tile-name{font-size:14px;font-weight:700;color:var(--text);}
+.zone-tile-desc{font-size:12px;color:var(--text-2);margin-top:2px;}
+.zone-tile-meta{font-size:11px;margin-top:6px;font-weight:500;}
 .av .zone-tile-meta{color:var(--green);}.pt .zone-tile-meta{color:var(--amber);}.oc .zone-tile-meta{color:var(--red);}
-.zone-tile-bar{height:3px;border-radius:99px;background:rgba(0,0,0,.1);margin-top:8px;overflow:hidden;}
+.zone-tile-bar{height:4px;border-radius:99px;background:rgba(0,0,0,.1);margin-top:8px;overflow:hidden;}
 .zone-tile-fill{height:100%;border-radius:99px;}
 .av .zone-tile-fill{background:var(--green);}.pt .zone-tile-fill{background:var(--amber);}.oc .zone-tile-fill{background:var(--red);}
-.zone-tile-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:14px;color:rgba(0,0,0,.2);}
-.zone-full{display:none;flex-direction:column;min-height:400px;}
+.zone-tile-arrow{font-size:18px;color:rgba(0,0,0,.25);}
+
+/* ── SALA DE PROFESORES EXPANDIDA ── */
+.zone-full{display:none;flex-direction:column;}
 .zone-full.show{display:flex;}
 .zf-header{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .zf-back{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:500;color:var(--text-2);background:var(--surface2);border:1px solid var(--border2);border-radius:7px;padding:5px 10px;cursor:pointer;transition:all .15s;}
@@ -130,52 +133,68 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .zf-badge.av{background:var(--green-bg);border-color:var(--green-bd);color:var(--green);}
 .zf-badge.pt{background:var(--amber-bg);border-color:var(--amber-bd);color:var(--amber);}
 .zf-badge.oc{background:var(--red-bg);border-color:var(--red-bd);color:var(--red);}
-.zf-legend{display:flex;gap:12px;padding:9px 16px;border-bottom:1px solid var(--border);background:var(--surface2);flex-shrink:0;}
-.zf-leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-2);}
-.zf-leg-sq{width:10px;height:10px;border-radius:3px;}
-.miniplan{background:var(--bg);padding:16px;overflow-y:auto;}
-.mp-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
-.mp-aisle{height:16px;margin:4px 0 10px;display:flex;align-items:center;gap:6px;}
-.mp-aisle-line{flex:1;height:1px;border-top:1px dashed var(--border2);}
-.mp-aisle-label{font-size:9px;color:var(--text-3);letter-spacing:.06em;flex-shrink:0;}
-.desk-unit{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;position:relative;}
-.desk-top{width:50px;height:32px;border-radius:6px;border:1.5px solid;position:relative;transition:transform .12s;}
-.desk-unit:hover .desk-top{transform:scale(1.07);}
-.desk-monitor{position:absolute;top:5px;left:50%;transform:translateX(-50%);width:17px;height:12px;border-radius:2px;border:1.5px solid rgba(0,0,0,.12);}
-.desk-chair{width:26px;height:11px;border-radius:3px 3px 6px 6px;border:1.5px solid;}
-.desk-num{font-size:9px;color:var(--text-3);margin-top:1px;}
-.desk-unit.free .desk-top{background:#B8DEC0;border-color:#82B88A;box-shadow:0 4px 0 #5A9060;}
-.desk-unit.free .desk-monitor{background:#6AAF78;}
-.desk-unit.free .desk-chair{background:#8EC498;border-color:#5A9060;box-shadow:0 2px 0 rgba(60,130,70,.3);}
-.desk-unit.taken .desk-top{background:#F0AAAA;border-color:#C07070;box-shadow:0 4px 0 #A05050;}
-.desk-unit.taken .desk-monitor{background:#C05050;}
-.desk-unit.taken .desk-chair{background:#D48080;border-color:#A05050;box-shadow:0 2px 0 rgba(160,60,60,.3);}
-.meeting-full{background:var(--bg);padding:16px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;}
-.meeting-status-bar{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;border:1.5px solid;}
-.meeting-status-bar.av{background:var(--green-bg);border-color:var(--green-bd);}
-.meeting-status-bar.oc{background:var(--red-bg);border-color:var(--red-bd);}
-.ms-dot{width:12px;height:12px;border-radius:3px;box-shadow:0 2px 0 rgba(0,0,0,.15);flex-shrink:0;}
-.av .ms-dot{background:var(--green);}.oc .ms-dot{background:var(--red);}
-.ms-name{font-size:13px;font-weight:600;color:var(--text);}
-.ms-cap{font-size:11px;color:var(--text-2);margin-top:2px;}
-.meeting-label{font-size:11px;font-weight:600;color:var(--text-3);letter-spacing:.05em;text-transform:uppercase;}
-.meeting-chairs{display:flex;gap:10px;flex-wrap:wrap;}
-.mchair{display:flex;flex-direction:column;align-items:center;gap:3px;}
-.mchair-top{width:42px;height:28px;border-radius:6px;border:1.5px solid;position:relative;transition:transform .12s;}
-.mchair:hover .mchair-top{transform:scale(1.06);}
-.mchair-mon{position:absolute;top:5px;left:50%;transform:translateX(-50%);width:15px;height:10px;border-radius:2px;border:1px solid rgba(0,0,0,.12);}
-.mchair-bot{width:22px;height:10px;border-radius:3px 3px 6px 6px;border:1.5px solid;}
-.mchair.free .mchair-top{background:#B8DEC0;border-color:#82B88A;box-shadow:0 3px 0 #5A9060;}
-.mchair.free .mchair-mon{background:#6AAF78;}
-.mchair.free .mchair-bot{background:#8EC498;border-color:#5A9060;box-shadow:0 2px 0 rgba(60,130,70,.25);}
-.mchair.taken .mchair-top{background:#F0AAAA;border-color:#C07070;box-shadow:0 3px 0 #A05050;}
-.mchair.taken .mchair-mon{background:#C05050;}
-.mchair.taken .mchair-bot{background:#D48080;border-color:#A05050;box-shadow:0 2px 0 rgba(160,60,60,.25);}
-.manage-btn{padding:10px 14px;border-radius:9px;border:1.5px solid var(--green-bd);background:var(--green-bg);color:var(--green);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;width:100%;transition:background .2s;}
-.manage-btn:hover{background:#C6E6CA;}
+
+/* Sala de profesores layout */
+.sala-wrap{padding:20px;background:var(--bg);overflow-y:auto;}
+.sala-header-info{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.sala-stats{display:flex;gap:12px;}
+.sala-stat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;text-align:center;}
+.sala-stat-val{font-size:18px;font-weight:700;}
+.sala-stat-val.g{color:var(--green);}
+.sala-stat-val.r{color:var(--red);}
+.sala-stat-lbl{font-size:10px;color:var(--text-3);margin-top:1px;}
+.sala-legend{display:flex;gap:14px;align-items:center;}
+.sala-leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-2);}
+.sala-leg-dot{width:10px;height:10px;border-radius:3px;}
+
+/* Plano de la sala */
+.sala-plano{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;position:relative;}
+.sala-label{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3);text-align:center;margin-bottom:16px;}
+
+/* Filas de puestos */
+.sala-fila{display:flex;justify-content:center;gap:14px;margin-bottom:24px;}
+.sala-fila:last-child{margin-bottom:0;}
+
+/* Pasillo separador */
+.sala-pasillo{display:flex;align-items:center;gap:10px;margin:4px 0 20px;}
+.sala-pasillo-line{flex:1;height:1px;border-top:2px dashed var(--border2);}
+.sala-pasillo-label{font-size:9px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;flex-shrink:0;}
+
+/* Puesto individual */
+.puesto{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
+.puesto-mesa{width:62px;height:40px;border-radius:8px;border:2px solid;position:relative;transition:transform .12s,box-shadow .12s;}
+.puesto:hover .puesto-mesa{transform:scale(1.06);}
+.puesto-monitor{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:20px;height:13px;border-radius:3px;border:1.5px solid rgba(0,0,0,.15);}
+.puesto-silla{width:30px;height:13px;border-radius:4px 4px 8px 8px;border:2px solid;}
+.puesto-num{font-size:9px;color:var(--text-3);font-family:var(--mono);}
+.puesto-nombre{font-size:8px;color:var(--text-2);font-weight:600;max-width:62px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* Puesto libre */
+.puesto.libre .puesto-mesa{background:#C6E8CC;border-color:#82B88A;box-shadow:0 3px 0 #5A9060;}
+.puesto.libre .puesto-monitor{background:#6AAF78;}
+.puesto.libre .puesto-silla{background:#8EC498;border-color:#5A9060;box-shadow:0 2px 0 rgba(60,130,70,.3);}
+/* Puesto ocupado */
+.puesto.ocupado .puesto-mesa{background:#F0AAAA;border-color:#C07070;box-shadow:0 3px 0 #A05050;}
+.puesto.ocupado .puesto-monitor{background:#C05050;}
+.puesto.ocupado .puesto-silla{background:#D48080;border-color:#A05050;box-shadow:0 2px 0 rgba(160,60,60,.3);}
+/* Puesto reservado */
+.puesto.reservado .puesto-mesa{background:#DDE0FC;border-color:#9BA4F0;box-shadow:0 3px 0 #7F77DD;}
+.puesto.reservado .puesto-monitor{background:#7F77DD;}
+.puesto.reservado .puesto-silla{background:#B0B8F5;border-color:#7F77DD;box-shadow:0 2px 0 rgba(127,119,221,.3);}
+
+/* Pizarra */
+.pizarra{background:#2C4A2E;border-radius:8px;height:22px;margin-bottom:20px;display:flex;align-items:center;justify-content:center;}
+.pizarra-label{font-size:10px;color:rgba(255,255,255,.5);letter-spacing:.1em;text-transform:uppercase;}
+
+/* Tooltip */
+#puesto-tooltip{display:none;position:fixed;z-index:700;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);padding:10px 14px;font-size:12px;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.12);min-width:150px;}
+#puesto-tooltip.show{display:block;}
+.pt-name{font-weight:700;color:var(--text);margin-bottom:4px;}
+.pt-row{display:flex;justify-content:space-between;gap:16px;font-size:11px;color:var(--text-2);margin-top:3px;}
+.pt-val{color:var(--text);font-weight:500;}
+
+/* ── AVAILABILITY PANEL ── */
 .avail-body{padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;max-height:calc(100vh - 210px);}
-.floor-group-title{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3);padding:4px 0;display:flex;align-items:center;gap:8px;margin-top:4px;}
-.floor-group-title::after{content:'';flex:1;height:1px;background:var(--border);}
 .avail-zone{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .2s;border-left:4px solid;}
 .avail-zone:hover{background:var(--surface3);transform:translateX(2px);}
 .avail-zone.av{border-left-color:var(--green);}.avail-zone.pt{border-left-color:var(--amber);}.avail-zone.oc{border-left-color:var(--red);}
@@ -189,6 +208,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .az-bar{height:3px;border-radius:99px;background:var(--surface3);margin-top:7px;overflow:hidden;}
 .az-fill{height:100%;border-radius:99px;transition:width .4s;}
 .av .az-fill{background:var(--green);}.pt .az-fill{background:var(--amber);}.oc .az-fill{background:var(--red);}
+
+/* ── MODAL ── */
 .modal-backdrop{display:none;position:fixed;inset:0;z-index:600;background:rgba(30,28,24,.5);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;}
 .modal-backdrop.active{display:flex;}
 .space-modal{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.15);animation:modalIn .3s cubic-bezier(.16,1,.3,1) both;}
@@ -225,8 +246,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .btn-checkout:hover:not(:disabled){background:#EEC8C8;}
 .modal-feedback{text-align:center;font-size:12px;font-weight:500;min-height:18px;}
 .modal-feedback.ok{color:var(--green);}.modal-feedback.err{color:var(--red);}
-#desk-tooltip{display:none;position:fixed;z-index:700;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.12);min-width:130px;}
-#desk-tooltip.show{display:block;}
 </style>
 </head>
 <body>
@@ -269,7 +288,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
     <div class="topbar-left">
       <div class="topbar-icon">🏢</div>
       <div class="topbar-name">DeskFlow</div>
-      <div class="topbar-sep"></div>
+      <div class="topbar-sep" style="width:1px;height:18px;background:var(--border2);margin:0 4px;"></div>
       <div class="ws-pill"><div class="ws-dot" id="ws-dot"></div><span id="ws-label">Desconectado</span></div>
     </div>
     <div class="topbar-right">
@@ -285,38 +304,41 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
     <div class="session-badge"><div class="session-dot"></div><span id="session-time">Sesión: 00:00</span></div>
     <span>DNI: <span id="user-dni" style="color:var(--text-2);font-weight:500">—</span></span>
   </div>
+
   <div class="dash-body">
     <div class="stats-row">
-      <div class="stat-card"><div class="stat-icon g">✅</div><div><div class="stat-val g" id="stat-free">—</div><div class="stat-lbl">Espacios libres</div></div></div>
+      <div class="stat-card"><div class="stat-icon g">✅</div><div><div class="stat-val g" id="stat-free">—</div><div class="stat-lbl">Puestos libres</div></div></div>
       <div class="stat-card"><div class="stat-icon r">🔴</div><div><div class="stat-val r" id="stat-occ">—</div><div class="stat-lbl">Ocupados</div></div></div>
-      <div class="stat-card"><div class="stat-icon b">📍</div><div><div class="stat-val b" id="stat-total">—</div><div class="stat-lbl">Total espacios</div></div></div>
-      <div class="stat-card"><div class="stat-icon a">📊</div><div><div class="stat-val a" id="stat-pct">—</div><div class="stat-lbl">Ocupación global</div></div></div>
+      <div class="stat-card"><div class="stat-icon b">📍</div><div><div class="stat-val b" id="stat-total">—</div><div class="stat-lbl">Total puestos</div></div></div>
+      <div class="stat-card"><div class="stat-icon a">📊</div><div><div class="stat-val a" id="stat-pct">—</div><div class="stat-lbl">Ocupación</div></div></div>
     </div>
+
     <div class="main-grid">
+      <!-- MAPA -->
       <div class="panel" id="panel-map">
         <div class="panel-head" id="map-head">
-          <div><div class="panel-title" id="map-title">Planta baja</div><div class="panel-sub">Selecciona una zona para ver el detalle</div></div>
-          <div class="floor-tabs">
-            <button class="floor-tab active" onclick="switchFloor('baja',this)">Planta baja</button>
-            <button class="floor-tab" onclick="switchFloor('primera',this)">1ª Planta</button>
-          </div>
+          <div><div class="panel-title">Sala de profesores</div><div class="panel-sub">Haz clic para ver y gestionar los puestos</div></div>
         </div>
-        <div class="map-body" id="zones-collapsed"><div class="fp-zones-grid" id="fp-zones-grid"></div></div>
+
+        <!-- Vista colapsada: tile de la sala -->
+        <div class="map-body" id="zones-collapsed">
+          <div id="fp-zones-grid"></div>
+        </div>
+
+        <!-- Vista expandida: plano -->
         <div class="zone-full" id="zone-full">
           <div class="zf-header">
             <button class="zf-back" onclick="closeZone()">← Volver</button>
             <div class="zf-title" id="zf-title"></div>
             <div class="zf-badge" id="zf-badge"></div>
           </div>
-          <div class="zf-legend">
-            <div class="zf-leg"><div class="zf-leg-sq" style="background:#B8DEC0;border:1px solid #82B88A;box-shadow:0 2px 0 #5A9060;border-radius:3px;"></div>Libre</div>
-            <div class="zf-leg"><div class="zf-leg-sq" style="background:#F0AAAA;border:1px solid #C07070;box-shadow:0 2px 0 #A05050;border-radius:3px;"></div>Ocupado</div>
-          </div>
           <div id="zf-body"></div>
         </div>
       </div>
+
+      <!-- DISPONIBILIDAD -->
       <div class="panel" id="panel-availability">
-        <div class="panel-head"><div><div class="panel-title">Disponibilidad</div><div class="panel-sub">Por zonas en tiempo real</div></div></div>
+        <div class="panel-head"><div><div class="panel-title">Disponibilidad</div><div class="panel-sub">Puestos en tiempo real</div></div></div>
         <div class="avail-body" id="avail-body"></div>
       </div>
     </div>
@@ -345,23 +367,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
     <div class="modal-actions">
       <button class="modal-btn btn-reserve" id="btn-reserve" onclick="doReserve()">Reservar (5 min)</button>
       <button class="modal-btn btn-confirm" id="btn-confirm" onclick="doConfirm()">✓ Confirmar reserva</button>
-      <button class="modal-btn btn-checkin" id="btn-checkin" onclick="doCheckin()">Entrar al espacio</button>
-      <button class="modal-btn btn-checkout" id="btn-checkout" onclick="doCheckout()">Salir del espacio</button>
+      <button class="modal-btn btn-checkin" id="btn-checkin" onclick="doCheckin()">Entrar al puesto</button>
+      <button class="modal-btn btn-checkout" id="btn-checkout" onclick="doCheckout()">Salir del puesto</button>
       <div class="modal-feedback" id="modal-feedback"></div>
     </div>
   </div>
 </div>
 
-<div id="desk-tooltip">
-  <div style="font-weight:600;color:var(--text);margin-bottom:4px;" id="dt-name"></div>
-  <div style="display:flex;justify-content:space-between;gap:16px;font-size:11px;color:var(--text-2);">
-    <span>Estado</span><span style="color:var(--text);font-weight:500;" id="dt-st"></span>
-  </div>
+<!-- TOOLTIP PUESTO -->
+<div id="puesto-tooltip">
+  <div class="pt-name" id="pt-name"></div>
+  <div class="pt-row"><span>Estado</span><span class="pt-val" id="pt-st"></span></div>
+  <div class="pt-row"><span>Ocupación</span><span class="pt-val" id="pt-occ"></span></div>
 </div>
 
 <script>
 const API='http://localhost:8000', WS='ws://localhost:8000/ws';
-let token=null,currentUser=null,currentFloor='baja';
+let token=null,currentUser=null;
 let sessionStart=null,sessionInterval=null,ws=null;
 let spacesCache={},zonesCache={};
 let modalSpaceId=null,modalTimerIv=null,openZoneId=null;
@@ -442,12 +464,14 @@ async function loadData(){
   try{
     const[zones,spaces]=await Promise.all([apiFetch('/zones/'),apiFetch('/spaces/')]);
     zonesCache={};spacesCache={};
-    zones.forEach(z=>zonesCache[z.id]=z);spaces.forEach(s=>spacesCache[s.id]=s);
-    buildAvailability();buildFloorPlan(currentFloor);updateStats();
+    zones.forEach(z=>zonesCache[z.id]=z);
+    spaces.forEach(s=>spacesCache[s.id]=s);
+    buildZoneTile();buildAvailability();updateStats();
   }catch(e){console.error(e);}
   finally{$$('loading-overlay').classList.remove('active');}
 }
 
+/* WS */
 function connectWS(){
   if(ws)ws.close();setWsDot('connecting');
   ws=new WebSocket(`${WS}?room=all`);
@@ -457,16 +481,15 @@ function connectWS(){
       const{event,payload}=JSON.parse(data);
       if(event==='space_updated'){
         spacesCache[payload.id]=payload;
-        apiFetch(`/zones/${payload.zone_id}`).then(z=>{zonesCache[z.id]=z;buildAvailability();updateStats();}).catch(()=>{});
-        const z=zonesCache[payload.zone_id];
-        if(z&&z.floor===currentFloor)buildFloorPlan(currentFloor);
+        apiFetch(`/zones/${payload.zone_id}`).then(z=>{zonesCache[z.id]=z;buildAvailability();updateStats();buildZoneTile();}).catch(()=>{});
         if(modalSpaceId===payload.id)renderModal();
-        if(openZoneId===payload.zone_id){const zo=zonesCache[openZoneId];if(zo)refreshZoneDetail(zo);}
+        if(openZoneId===payload.zone_id){const zo=zonesCache[openZoneId];if(zo)renderSalaPlano(zo);}
       }
       if(event==='reservation_expired'){
         apiFetch(`/spaces/${payload.space_id}`).then(s=>{
-          spacesCache[s.id]=s;buildFloorPlan(currentFloor);
+          spacesCache[s.id]=s;
           if(modalSpaceId===s.id)renderModal();
+          if(openZoneId){const zo=zonesCache[openZoneId];if(zo)renderSalaPlano(zo);}
         }).catch(()=>{});
       }
     }catch(_){}
@@ -488,7 +511,8 @@ function updateStats(){
   const cap=sp.reduce((a,s)=>a+s.capacity,0);
   const occT=sp.reduce((a,s)=>a+s.occupancy,0);
   $$('stat-free').textContent=free;$$('stat-occ').textContent=occ;
-  $$('stat-total').textContent=sp.length;$$('stat-pct').textContent=(cap?Math.round(occT/cap*100):0)+'%';
+  $$('stat-total').textContent=sp.length;
+  $$('stat-pct').textContent=(cap?Math.round(occT/cap*100):0)+'%';
 }
 
 function zoneSt(z){
@@ -498,139 +522,169 @@ function zoneSt(z){
 }
 const ST_TILE={av:'Libre',pt:'Parcial',oc:'Ocupado'};
 
+/* Tile único de la zona principal (ZA) */
+function buildZoneTile(){
+  const grid=$$('fp-zones-grid');grid.innerHTML='';
+  const zones=Object.values(zonesCache);
+  if(!zones.length){grid.innerHTML='<div style="color:var(--text-3);font-size:12px;padding:10px;">Sin datos</div>';return;}
+  // Mostrar solo la primera zona (ZA - Sala de profesores)
+  const z=zones[0];
+  const st=zoneSt(z),pct=Math.round(z.occupancy_pct);
+  const tile=document.createElement('div');
+  tile.className=`zone-tile ${st}`;
+  tile.innerHTML=`
+    <div class="zone-tile-icon">👩‍🏫</div>
+    <div class="zone-tile-info">
+      <div class="zone-tile-name">${z.name}</div>
+      <div class="zone-tile-desc">${z.description||'Sala de trabajo'}</div>
+      <div class="zone-tile-meta">${z.occupied} ocupados · ${z.available} libres · ${pct}% ocupación</div>
+      <div class="zone-tile-bar"><div class="zone-tile-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="zone-tile-arrow">›</div>`;
+  tile.onclick=()=>openZoneById(z.id);
+  grid.appendChild(tile);
+}
+
+/* Disponibilidad lateral */
 function buildAvailability(){
   const c=$$('avail-body');c.innerHTML='';
-  const groups={};
-  Object.values(zonesCache).forEach(z=>{if(!groups[z.floor])groups[z.floor]=[];groups[z.floor].push(z);});
-  ['baja','primera'].forEach(floor=>{
-    const zones=groups[floor];if(!zones||!zones.length)return;
-    const t=document.createElement('div');t.className='floor-group-title';
-    t.textContent=floor==='baja'?'Planta baja':'Primera planta';c.appendChild(t);
-    zones.forEach(z=>{
-      const st=zoneSt(z),pct=Math.round(z.occupancy_pct);
-      const d=document.createElement('div');d.className=`avail-zone ${st}`;
-      d.innerHTML=`<div class="az-row"><div class="az-name">${z.code} — ${z.name}</div><div class="az-badge ${st}">${ST_TILE[st]}</div></div>
-        <div class="az-pct">${z.occupied} ocup · ${z.available} libre · ${pct}%</div>
-        <div class="az-bar"><div class="az-fill" style="width:${pct}%"></div></div>`;
-      d.onclick=()=>{
-        if(z.floor!==currentFloor){
-          const btn=document.querySelector(z.floor==='baja'?'.floor-tab:first-child':'.floor-tab:last-child');
-          switchFloor(z.floor,btn);setTimeout(()=>openZoneById(z.id),60);
-        }else openZoneById(z.id);
-      };
-      c.appendChild(d);
-    });
+  const zones=Object.values(zonesCache);
+  if(!zones.length)return;
+  const z=zones[0];
+  const st=zoneSt(z),pct=Math.round(z.occupancy_pct);
+  const spaces=Object.values(spacesCache).filter(s=>s.zone_id===z.id);
+
+  // Resumen de zona
+  const d=document.createElement('div');d.className=`avail-zone ${st}`;
+  d.innerHTML=`<div class="az-row"><div class="az-name">${z.code} — ${z.name}</div><div class="az-badge ${st}">${ST_TILE[st]}</div></div>
+    <div class="az-pct">${z.occupied} ocup · ${z.available} libre · ${pct}%</div>
+    <div class="az-bar"><div class="az-fill" style="width:${pct}%"></div></div>`;
+  d.onclick=()=>openZoneById(z.id);
+  c.appendChild(d);
+
+  // Lista de puestos
+  spaces.forEach(sp=>{
+    const stSp={available:'av',occupied:'oc',partial:'pt',reserved:'res',maintenance:'mnt'}[sp.status]||'av';
+    const stLabel={available:'Libre',occupied:'Ocupado',partial:'Parcial',reserved:'Reservado',maintenance:'Mant.'}[sp.status]||sp.status;
+    const item=document.createElement('div');
+    item.style.cssText='background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:space-between;';
+    item.innerHTML=`<div style="font-size:12px;font-weight:600;color:var(--text);">${sp.code} <span style="font-weight:400;color:var(--text-2);">— ${sp.label.replace(/^[^-]+ - /,'')}</span></div>
+      <div class="az-badge ${stSp==='av'?'av':stSp==='oc'?'oc':'pt'}">${stLabel}</div>`;
+    item.onmouseenter=()=>{item.style.background='var(--surface3)';};
+    item.onmouseleave=()=>{item.style.background='var(--surface2)';};
+    item.onclick=()=>openModal(sp.id);
+    c.appendChild(item);
   });
 }
 
-function buildFloorPlan(floor){
-  const grid=$$('fp-zones-grid');grid.innerHTML='';
-  $$('map-title').textContent=floor==='baja'?'Planta baja':'Primera planta';
-  const zones=Object.values(zonesCache).filter(z=>z.floor===floor);
-  if(!zones.length){grid.innerHTML='<div style="color:var(--text-3);font-size:12px;padding:20px;">Sin datos — ejecuta seed.py</div>';return;}
-  zones.forEach(z=>{
-    const st=zoneSt(z),pct=Math.round(z.occupancy_pct);
-    const isMeeting=z.total_spaces<=6;
-    const tile=document.createElement('div');tile.className=`zone-tile ${st}`;
-    tile.innerHTML=`<div class="zone-tile-icon">${isMeeting?'🤝':'💼'}</div>
-      <div class="zone-tile-name">${z.code} — ${z.name}</div>
-      <div class="zone-tile-meta">${z.occupied}/${z.total_spaces} · ${pct}%</div>
-      <div class="zone-tile-bar"><div class="zone-tile-fill" style="width:${pct}%"></div></div>
-      <div class="zone-tile-arrow">›</div>`;
-    tile.onclick=()=>openZoneById(z.id);
-    grid.appendChild(tile);
-  });
-}
-
+/* Abrir zona → mostrar plano */
 function openZoneById(zoneId){
   const z=zonesCache[zoneId];if(!z)return;
   openZoneId=zoneId;
   $$('zones-collapsed').style.display='none';
   $$('map-head').style.display='none';
   $$('zone-full').classList.add('show');
-  refreshZoneDetail(z);
-}
-
-function refreshZoneDetail(z){
   const st=zoneSt(z);
   $$('zf-title').textContent=`${z.code} — ${z.name}`;
   const badge=$$('zf-badge');badge.textContent=ST_TILE[st];badge.className=`zf-badge ${st}`;
-  const body=$$('zf-body');body.innerHTML='';
-  const spaces=Object.values(spacesCache).filter(s=>s.zone_id===z.id);
-  const isMeeting=spaces.length>0&&spaces.length<=6&&(spaces[0]?.capacity||0)<=10;
-  if(isMeeting||z.total_spaces<=6)renderMeetingDetail(body,z,spaces,st);
-  else renderOpenAreaDetail(body,z,spaces);
-}
-
-function renderMeetingDetail(body,z,spaces,st){
-  const totalOcc=spaces.reduce((a,s)=>a+s.occupancy,0);
-  const totalCap=spaces.reduce((a,s)=>a+s.capacity,0);
-  const sc=totalOcc>=1?'oc':'av';
-  const wrap=document.createElement('div');wrap.className='meeting-full';
-  const sb=document.createElement('div');sb.className=`meeting-status-bar ${sc}`;
-  sb.innerHTML=`<div class="ms-dot"></div><div><div class="ms-name">${z.name}</div><div class="ms-cap">${totalOcc} de ${totalCap} personas · ${totalOcc>=1?'En uso':'Disponible'}</div></div>`;
-  wrap.appendChild(sb);
-  const lbl=document.createElement('div');lbl.className='meeting-label';lbl.textContent='Distribución de asientos';
-  wrap.appendChild(lbl);
-  const chairs=document.createElement('div');chairs.className='meeting-chairs';
-  for(let i=0;i<totalCap;i++){
-    const taken=i<totalOcc;
-    const ch=document.createElement('div');ch.className=`mchair ${taken?'taken':'free'}`;
-    ch.innerHTML=`<div class="mchair-top"><div class="mchair-mon"></div></div><div class="mchair-bot"></div>`;
-    chairs.appendChild(ch);
-  }
-  wrap.appendChild(chairs);
-  if(spaces.length===1){
-    const btn=document.createElement('button');btn.className='manage-btn';
-    btn.textContent='Gestionar espacio';btn.onclick=()=>openModal(spaces[0].id);
-    wrap.appendChild(btn);
-  }
-  body.appendChild(wrap);
-}
-
-function renderOpenAreaDetail(body,z,spaces){
-  const wrap=document.createElement('div');wrap.className='miniplan';
-  const COLS=7;const rows=[];
-  for(let i=0;i<spaces.length;i+=COLS)rows.push(spaces.slice(i,i+COLS));
-  rows.forEach((row,ri)=>{
-    if(ri>0){
-      const aisle=document.createElement('div');aisle.className='mp-aisle';
-      aisle.innerHTML='<div class="mp-aisle-line"></div><span class="mp-aisle-label">PASILLO</span><div class="mp-aisle-line"></div>';
-      wrap.appendChild(aisle);
-    }
-    const rowEl=document.createElement('div');rowEl.className='mp-row';
-    row.forEach(sp=>{
-      const taken=sp.status==='occupied'||sp.status==='partial';
-      const du=document.createElement('div');du.className=`desk-unit ${taken?'taken':'free'}`;
-      du.innerHTML=`<div class="desk-top"><div class="desk-monitor"></div></div><div class="desk-chair"></div><div class="desk-num">${sp.code}</div>`;
-      du.addEventListener('mouseenter',e=>{
-        $$('dt-name').textContent=sp.label;
-        $$('dt-st').textContent={available:'Libre',occupied:'Ocupado',partial:'Parcial',reserved:'Reservado',maintenance:'Mantenimiento'}[sp.status]||sp.status;
-        const tt=$$('desk-tooltip');tt.style.left=(e.clientX+14)+'px';tt.style.top=(e.clientY-10)+'px';tt.classList.add('show');
-      });
-      du.addEventListener('mousemove',e=>{const tt=$$('desk-tooltip');tt.style.left=(e.clientX+14)+'px';tt.style.top=(e.clientY-10)+'px';});
-      du.addEventListener('mouseleave',()=>$$('desk-tooltip').classList.remove('show'));
-      du.addEventListener('click',()=>openModal(sp.id));
-      rowEl.appendChild(du);
-    });
-    wrap.appendChild(rowEl);
-  });
-  body.appendChild(wrap);
+  renderSalaPlano(z);
 }
 
 function closeZone(){
   openZoneId=null;
-  $$('zones-collapsed').style.display='';$$('map-head').style.display='';
-  $$('zone-full').classList.remove('show');$$('zf-body').innerHTML='';
+  $$('zones-collapsed').style.display='';
+  $$('map-head').style.display='';
+  $$('zone-full').classList.remove('show');
+  $$('zf-body').innerHTML='';
 }
 
-function switchFloor(floor,btn){
-  currentFloor=floor;
-  document.querySelectorAll('.floor-tab').forEach(b=>b.classList.remove('active'));
-  if(btn)btn.classList.add('active');
-  closeZone();buildFloorPlan(floor);
+/* Plano tipo sala de profesores: 3 filas de puestos enfrentados */
+function renderSalaPlano(z){
+  const body=$$('zf-body');body.innerHTML='';
+  const spaces=Object.values(spacesCache).filter(s=>s.zone_id===z.id);
+  const libre=spaces.filter(s=>s.status==='available').length;
+  const ocup=spaces.filter(s=>s.status==='occupied'||s.status==='partial').length;
+
+  const wrap=document.createElement('div');wrap.className='sala-wrap';
+
+  // Cabecera con stats y leyenda
+  const hdr=document.createElement('div');hdr.className='sala-header-info';
+  hdr.innerHTML=`
+    <div class="sala-stats">
+      <div class="sala-stat"><div class="sala-stat-val g">${libre}</div><div class="sala-stat-lbl">Libres</div></div>
+      <div class="sala-stat"><div class="sala-stat-val r">${ocup}</div><div class="sala-stat-lbl">Ocupados</div></div>
+      <div class="sala-stat"><div class="sala-stat-val" style="color:var(--text)">${spaces.length}</div><div class="sala-stat-lbl">Total</div></div>
+    </div>
+    <div class="sala-legend">
+      <div class="sala-leg"><div class="sala-leg-dot" style="background:#C6E8CC;border:1.5px solid #82B88A;"></div>Libre</div>
+      <div class="sala-leg"><div class="sala-leg-dot" style="background:#F0AAAA;border:1.5px solid #C07070;"></div>Ocupado</div>
+      <div class="sala-leg"><div class="sala-leg-dot" style="background:#DDE0FC;border:1.5px solid #9BA4F0;"></div>Reservado</div>
+    </div>`;
+  wrap.appendChild(hdr);
+
+  // Plano
+  const plano=document.createElement('div');plano.className='sala-plano';
+
+  // Pizarra al frente
+  const piz=document.createElement('div');piz.className='pizarra';
+  piz.innerHTML='<span class="pizarra-label">Pizarra / Proyector</span>';
+  plano.appendChild(piz);
+
+  // Distribuir puestos en filas de 4 (estilo sala de profesores)
+  const COLS=4;
+  const mitad=Math.ceil(spaces.length/2);
+  const fila1=spaces.slice(0,mitad);
+  const fila2=spaces.slice(mitad);
+
+  // Fila delantera (miran hacia pizarra)
+  const rowA=buildFila(fila1,'Fila A');
+  plano.appendChild(rowA);
+
+  // Pasillo central
+  const pasillo=document.createElement('div');pasillo.className='sala-pasillo';
+  pasillo.innerHTML='<div class="sala-pasillo-line"></div><span class="sala-pasillo-label">Pasillo</span><div class="sala-pasillo-line"></div>';
+  plano.appendChild(pasillo);
+
+  // Fila trasera
+  const rowB=buildFila(fila2,'Fila B');
+  plano.appendChild(rowB);
+
+  wrap.appendChild(plano);
+  body.appendChild(wrap);
 }
 
+function buildFila(spaces, label){
+  const wrap=document.createElement('div');
+  const lbl=document.createElement('div');
+  lbl.className='sala-label';lbl.textContent=label;
+  wrap.appendChild(lbl);
+  const fila=document.createElement('div');fila.className='sala-fila';
+  spaces.forEach(sp=>{
+    const cls=sp.status==='available'?'libre':sp.status==='reserved'?'reservado':'ocupado';
+    const stLabel={available:'Libre',occupied:'Ocupado',partial:'Parcial',reserved:'Reservado',maintenance:'Mantenimiento'}[sp.status]||sp.status;
+    const p=document.createElement('div');p.className=`puesto ${cls}`;
+    p.innerHTML=`<div class="puesto-mesa"><div class="puesto-monitor"></div></div><div class="puesto-silla"></div><div class="puesto-num">${sp.code}</div>`;
+    p.addEventListener('mouseenter',e=>{
+      const tt=$$('puesto-tooltip');
+      $$('pt-name').textContent=sp.label;
+      $$('pt-st').textContent=stLabel;
+      $$('pt-occ').textContent=`${sp.occupancy}/${sp.capacity}`;
+      tt.style.left=(e.clientX+14)+'px';tt.style.top=(e.clientY-10)+'px';
+      tt.classList.add('show');
+    });
+    p.addEventListener('mousemove',e=>{
+      const tt=$$('puesto-tooltip');
+      tt.style.left=(e.clientX+14)+'px';tt.style.top=(e.clientY-10)+'px';
+    });
+    p.addEventListener('mouseleave',()=>$$('puesto-tooltip').classList.remove('show'));
+    p.addEventListener('click',()=>openModal(sp.id));
+    fila.appendChild(p);
+  });
+  wrap.appendChild(fila);
+  return wrap;
+}
+
+/* MODAL */
 const ST_LABEL={available:'Libre',occupied:'Ocupado',partial:'Parcial',reserved:'Reservado',maintenance:'Mantenimiento'};
 const ST_CLS  ={available:'avail',occupied:'occup',partial:'partial',reserved:'reserved',maintenance:'maintenance'};
 
@@ -686,7 +740,7 @@ async function doConfirm(){
     await apiFetch(`/spaces/${modalSpaceId}/confirm`,{method:'POST'});
     setFeedback('✓ Check-in confirmado','ok');
     spacesCache[modalSpaceId]=await apiFetch(`/spaces/${modalSpaceId}`);renderModal();
-    if(openZoneId){const z=zonesCache[openZoneId];if(z)refreshZoneDetail(z);}
+    if(openZoneId){const z=zonesCache[openZoneId];if(z)renderSalaPlano(z);}
   }catch(e){setFeedback(e.message,'err');$$('btn-confirm').disabled=false;}
 }
 async function doCheckin(){
@@ -695,7 +749,7 @@ async function doCheckin(){
     await apiFetch(`/spaces/${modalSpaceId}/checkin`,{method:'POST'});
     setFeedback('✓ Entrada registrada','ok');
     spacesCache[modalSpaceId]=await apiFetch(`/spaces/${modalSpaceId}`);renderModal();
-    if(openZoneId){const z=zonesCache[openZoneId];if(z)refreshZoneDetail(z);}
+    if(openZoneId){const z=zonesCache[openZoneId];if(z)renderSalaPlano(z);}
   }catch(e){setFeedback(e.message,'err');$$('btn-checkin').disabled=false;}
 }
 async function doCheckout(){
@@ -704,7 +758,7 @@ async function doCheckout(){
     await apiFetch(`/spaces/${modalSpaceId}/checkout`,{method:'POST'});
     setFeedback('✓ Salida registrada','ok');
     spacesCache[modalSpaceId]=await apiFetch(`/spaces/${modalSpaceId}`);renderModal();
-    if(openZoneId){const z=zonesCache[openZoneId];if(z)refreshZoneDetail(z);}
+    if(openZoneId){const z=zonesCache[openZoneId];if(z)renderSalaPlano(z);}
   }catch(e){setFeedback(e.message,'err');$$('btn-checkout').disabled=false;}
 }
 </script>
