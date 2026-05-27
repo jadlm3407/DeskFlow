@@ -149,6 +149,23 @@ for a in assignments:
     db.add(a)
 db.commit()
 
+# ── NFC CARDS ─────────────────────────────────────────────────────────────────
+admin_user   = db.query(models.User).filter_by(dni="00000001A").first()
+alberto_user = db.query(models.User).filter_by(dni="12345678X").first()
+
+if admin_user and alberto_user:
+    nfc_cards = [
+        models.NfcCard(uid="04:FC:B2:40:BC:2A:81", user_id=admin_user.id,   label="Tarjeta admin"),
+        models.NfcCard(uid="04:FD:B2:40:BC:2A:81", user_id=alberto_user.id, label="Tarjeta Alberto"),
+    ]
+    for card in nfc_cards:
+        if not db.query(models.NfcCard).filter_by(uid=card.uid).first():
+            db.add(card)
+    db.commit()
+    print("✓ Tarjetas NFC insertadas")
+else:
+    print("✗ Error: usuarios no encontrados")
+
 db.close()
 print("✓ Seed completado")
 print("  admin:   DNI=00000001A  pass=admin1234")
