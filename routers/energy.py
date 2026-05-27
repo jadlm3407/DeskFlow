@@ -8,11 +8,11 @@ Endpoints:
   POST /energy/spaces/{id}/devices      → asigna un dispositivo a un espacio (admin/prof)
   DELETE /energy/assignments/{id}       → elimina una asignación (admin)
   GET  /energy/stats                    → estadísticas de consumo (filtro por período, espacio, zona)
+  POST /energy/report                   → genera y envía el informe por email (admin)
 """
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import func as sqlfunc
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 import models
@@ -56,10 +56,10 @@ class SpaceEnergyStats(BaseModel):
     space_id: int
     space_code: str
     space_label: str
-    total_hours: float          # horas totales ocupadas en el período
-    total_wh: float             # vatios-hora consumidos
-    total_kwh: float            # kWh consumidos
-    cost_eur: float             # coste estimado en euros
+    total_hours: float
+    total_wh: float
+    total_kwh: float
+    cost_eur: float
 
 class EnergyStatsResponse(BaseModel):
     period: str
@@ -70,15 +70,17 @@ class EnergyStatsResponse(BaseModel):
     price_per_kwh: float
     spaces: list[SpaceEnergyStats]
 
+class ReportRequest(BaseModel):
+    period: str = "week"   # today, week, month, year
 
-# ── Precio por kWh (configurable) ─────────────────────────────────────────────
-PRICE_PER_KWH = 0.18  # euros por kWh (precio medio España 2024)
+
+# ── Precio por kWh ────────────────────────────────────────────────────────────
+PRICE_PER_KWH = 0.18
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def get_period_range(period: str) -> tuple[datetime, datetime]:
-    """Devuelve (fecha_inicio, fecha_fin) según el período solicitado."""
     now = datetime.now(timezone.utc)
     if period == "today":
         start = now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -95,29 +97,29 @@ def get_period_range(period: str) -> tuple[datetime, datetime]:
 
 
 def calc_space_energy(space: models.Space, occupancies: list, period_start: datetime, period_end: datetime) -> SpaceEnergyStats:
-    """Calcula el consumo energético de un espacio dado sus registros de ocupación."""
-
-    # Vatios totales de todos los dispositivos asignados al espacio
     total_watts = sum(
         a.device.watts * a.quantity
         for a in space.device_assignments
     )
-
-    # Horas totales ocupadas en el período
     total_seconds = 0.0
     for occ in occupancies:
         if occ.space_id != space.id:
             continue
-        start = max(occ.entered_at, period_start)
+        entered = occ.entered_at
+        if entered.tzinfo is None:
+            entered = entered.replace(tzinfo=timezone.utc)
+        start = max(entered, period_start)
         end = occ.exited_at if occ.exited_at else period_end
+        if end.tzinfo is None:
+            end = end.replace(tzinfo=timezone.utc)
         end = min(end, period_end)
         if end > start:
             total_seconds += (end - start).total_seconds()
 
     total_hours = total_seconds / 3600
-    total_wh = total_watts * total_hours
-    total_kwh = total_wh / 1000
-    cost_eur = total_kwh * PRICE_PER_KWH
+    total_wh    = total_watts * total_hours
+    total_kwh   = total_wh / 1000
+    cost_eur    = total_kwh * PRICE_PER_KWH
 
     return SpaceEnergyStats(
         space_id=space.id,
@@ -146,7 +148,7 @@ def create_device(data: DeviceCreate, db: Session = Depends(get_db), _=Depends(r
     return device
 
 
-# ── Endpoints — asignación de dispositivos a espacios ─────────────────────────
+# ── Endpoints — asignación de dispositivos ────────────────────────────────────
 
 @router.get("/spaces/{space_id}/devices", response_model=list[AssignmentOut])
 def list_space_devices(space_id: int, db: Session = Depends(get_db), _=Depends(get_current_user)):
@@ -181,19 +183,18 @@ def delete_assignment(assignment_id: int, db: Session = Depends(get_db), _=Depen
     return {"detail": "Asignación eliminada"}
 
 
-# ── Endpoints — estadísticas de consumo ───────────────────────────────────────
+# ── Endpoints — estadísticas ──────────────────────────────────────────────────
 
 @router.get("/stats", response_model=EnergyStatsResponse)
 def energy_stats(
-    period: str = Query("month", description="Período: today, week, month, year"),
-    space_id: Optional[int] = Query(None, description="Filtrar por espacio"),
-    zone_id: Optional[int] = Query(None, description="Filtrar por zona"),
+    period: str = Query("month"),
+    space_id: Optional[int] = Query(None),
+    zone_id: Optional[int] = Query(None),
     db: Session = Depends(get_db),
     _=Depends(get_current_user),
 ):
     period_start, period_end = get_period_range(period)
 
-    # Espacios a analizar
     query = db.query(models.Space)
     if space_id:
         query = query.filter(models.Space.id == space_id)
@@ -201,19 +202,17 @@ def energy_stats(
         query = query.filter(models.Space.zone_id == zone_id)
     spaces = query.all()
 
-    # Ocupaciones en el período
     occupancies = db.query(models.Occupancy).filter(
         models.Occupancy.entered_at >= period_start,
         models.Occupancy.entered_at <= period_end,
     ).all()
 
-    # Calcular consumo por espacio
     space_stats = [
         calc_space_energy(space, occupancies, period_start, period_end)
         for space in spaces
     ]
 
-    total_kwh = round(sum(s.total_kwh for s in space_stats), 4)
+    total_kwh  = round(sum(s.total_kwh for s in space_stats), 4)
     total_cost = round(sum(s.cost_eur for s in space_stats), 4)
 
     return EnergyStatsResponse(
@@ -225,3 +224,49 @@ def energy_stats(
         price_per_kwh=PRICE_PER_KWH,
         spaces=space_stats,
     )
+
+
+# ── Endpoint — envío de informe por email ─────────────────────────────────────
+
+@router.post("/report")
+def send_report(
+    body: ReportRequest,
+    db: Session = Depends(get_db),
+    _=Depends(require_admin),
+):
+    """Genera las estadísticas del período y envía el informe por email al administrador."""
+    from email_report import send_energy_report
+
+    period_start, period_end = get_period_range(body.period)
+
+    spaces      = db.query(models.Space).all()
+    occupancies = db.query(models.Occupancy).filter(
+        models.Occupancy.entered_at >= period_start,
+        models.Occupancy.entered_at <= period_end,
+    ).all()
+
+    space_stats = [
+        calc_space_energy(space, occupancies, period_start, period_end)
+        for space in spaces
+    ]
+
+    total_kwh  = round(sum(s.total_kwh for s in space_stats), 4)
+    total_cost = round(sum(s.cost_eur for s in space_stats), 4)
+
+    stats = {
+        "period": body.period,
+        "from_date": period_start.isoformat(),
+        "to_date": period_end.isoformat(),
+        "total_kwh": total_kwh,
+        "total_cost_eur": total_cost,
+        "price_per_kwh": PRICE_PER_KWH,
+        "spaces": [s.model_dump() for s in space_stats],
+    }
+
+    period_labels = {"today": "diario", "week": "semanal", "month": "mensual", "year": "anual"}
+    ok = send_energy_report(stats, period_labels.get(body.period, body.period))
+
+    if ok:
+        return {"detail": f"Informe {body.period} enviado correctamente a peihaosun2007@gmail.com"}
+    else:
+        raise HTTPException(status_code=500, detail="Error al enviar el email. Revisa la configuración.")
