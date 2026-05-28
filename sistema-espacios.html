@@ -8,621 +8,327 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --bg:#F5F2EC;
-  --bg2:#EFEBE3;
-  --surface:#FFFFFF;
-  --surface2:#FAF8F4;
-  --surface3:#F0EDE6;
-  --border:rgba(0,0,0,0.06);
-  --border2:rgba(0,0,0,0.10);
-  --text:#1C1A16;
-  --text-2:#6B6356;
-  --text-3:#A09484;
-  --green:#3D7A45;
-  --green-light:#EBF5EC;
-  --green-mid:#B8D9BC;
-  --amber:#8A6010;
-  --amber-light:#FDF0D6;
-  --red:#8B2020;
-  --red-light:#FBE8E8;
-  --blue:#1E5FA8;
-  --blue-light:#E8F0FB;
-  --accent:#3D5A3E;
-  --accent-hover:#4A6E4C;
-  --sidebar-w:220px;
-  --topbar-h:52px;
-  --font:'Inter',sans-serif;
-  --mono:'JetBrains Mono',monospace;
-  --r:10px;
-  --r-sm:7px;
-  --r-lg:14px;
+  --bg:#F5F2EC;--bg2:#EFEBE3;--surface:#FFFFFF;--surface2:#FAF8F4;--surface3:#F0EDE6;
+  --border:rgba(0,0,0,0.06);--border2:rgba(0,0,0,0.10);
+  --text:#1C1A16;--text-2:#6B6356;--text-3:#A09484;
+  --green:#3D7A45;--green-light:#EBF5EC;--green-mid:#B8D9BC;
+  --amber:#8A6010;--amber-light:#FDF0D6;
+  --red:#8B2020;--red-light:#FBE8E8;
+  --blue:#1E5FA8;--blue-light:#E8F0FB;--blue-mid:#A8C4E8;
+  --accent:#3D5A3E;--accent-hover:#4A6E4C;
+  --purple:#5850C0;--purple-light:#EEEAFC;
+  --sidebar-w:220px;--topbar-h:52px;
+  --font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+  --r:10px;--r-sm:7px;--r-lg:14px;
 }
 body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;min-height:100vh;overflow:hidden;}
 
-/* ── ANIMATIONS ── */
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-@keyframes slideInLeft{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes scaleIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
-@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes nfc-expand{0%{opacity:0;transform:scale(.7);}40%{opacity:.6;}100%{opacity:0;transform:scale(1.1);}}
 
-/* ── VIEWS ── */
 .view{display:none;}.view.active{display:flex;}
 
-/* ══════════════════════════════════════════════
-   KIOSKO
-══════════════════════════════════════════════ */
-#view-kiosko{
-  position:fixed;inset:0;
-  background:var(--bg);
-  align-items:center;justify-content:center;
-  flex-direction:column;gap:0;
-}
-.kiosko-bg{
-  position:absolute;inset:0;
-  background:radial-gradient(ellipse at 70% 20%, rgba(61,90,62,.08) 0%, transparent 60%),
-             radial-gradient(ellipse at 20% 80%, rgba(61,90,62,.05) 0%, transparent 50%);
-  pointer-events:none;
-}
-.kiosko-top{
-  position:absolute;top:0;left:0;right:0;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:20px 28px;
-}
+/* ══ KIOSKO ══ */
+#view-kiosko{position:fixed;inset:0;background:var(--bg);align-items:center;justify-content:center;flex-direction:column;}
+.kiosko-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 70% 20%,rgba(61,90,62,.08) 0%,transparent 60%),radial-gradient(ellipse at 20% 80%,rgba(61,90,62,.05) 0%,transparent 50%);pointer-events:none;}
+.kiosko-top{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:20px 28px;}
 .kiosko-logo{display:flex;align-items:center;gap:8px;}
-.kiosko-logo-mark{
-  width:28px;height:28px;
-  background:var(--accent);border-radius:8px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:13px;color:#fff;font-weight:700;
-}
+.kiosko-logo-mark{width:28px;height:28px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:700;}
 .kiosko-logo-name{font-weight:700;font-size:14px;letter-spacing:-.3px;}
 .kiosko-time{font-family:var(--mono);font-size:12px;color:var(--text-3);}
-
-/* NFC animation */
 .kiosko-center{display:flex;flex-direction:column;align-items:center;gap:36px;animation:fadeIn .6s ease both;}
 .nfc-visual{position:relative;width:160px;height:160px;display:flex;align-items:center;justify-content:center;}
-.nfc-ring{
-  position:absolute;border-radius:50%;border:1.5px solid var(--green-mid);
-  animation:nfc-expand 2.4s ease-in-out infinite;
-}
+.nfc-ring{position:absolute;border-radius:50%;border:1.5px solid var(--green-mid);animation:nfc-expand 2.4s ease-in-out infinite;}
 .nfc-ring:nth-child(1){width:160px;height:160px;animation-delay:0s;}
 .nfc-ring:nth-child(2){width:120px;height:120px;animation-delay:.4s;}
 .nfc-ring:nth-child(3){width:80px;height:80px;animation-delay:.8s;}
-@keyframes nfc-expand{
-  0%{opacity:0;transform:scale(.7);}
-  40%{opacity:.6;}
-  100%{opacity:0;transform:scale(1.1);}
-}
-.nfc-core{
-  width:56px;height:56px;
-  background:var(--surface);
-  border:1.5px solid var(--border2);
-  border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:22px;
-  box-shadow:0 4px 20px rgba(61,90,62,.12);
-  position:relative;z-index:1;
-}
+.nfc-core{width:56px;height:56px;background:var(--surface);border:1.5px solid var(--border2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 20px rgba(61,90,62,.12);position:relative;z-index:1;}
 .kiosko-text{text-align:center;}
-.kiosko-title{font-size:26px;font-weight:700;letter-spacing:-.6px;color:var(--text);}
+.kiosko-title{font-size:26px;font-weight:700;letter-spacing:-.6px;}
 .kiosko-sub{font-size:14px;color:var(--text-2);margin-top:6px;line-height:1.6;}
-.kiosko-pill{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:6px 14px;border-radius:99px;
-  background:var(--surface);border:1px solid var(--border2);
-  font-size:11px;color:var(--text-2);font-weight:500;
-  margin-top:16px;
-}
+.kiosko-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:99px;background:var(--surface);border:1px solid var(--border2);font-size:11px;color:var(--text-2);font-weight:500;margin-top:16px;}
 .kiosko-pill-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite;}
-
-/* detected state */
-.kiosko-detected{
-  display:none;flex-direction:column;align-items:center;gap:20px;
-  animation:scaleIn .4s cubic-bezier(.16,1,.3,1) both;
-}
+.kiosko-detected{display:none;flex-direction:column;align-items:center;gap:20px;animation:scaleIn .4s cubic-bezier(.16,1,.3,1) both;}
 .kiosko-detected.show{display:flex;}
 .kiosko-center.hide{display:none;}
-.det-avatar{
-  width:72px;height:72px;border-radius:50%;
-  background:var(--accent);color:#fff;
-  display:flex;align-items:center;justify-content:center;
-  font-size:26px;font-weight:700;
-  box-shadow:0 8px 32px rgba(61,90,62,.25);
-}
+.det-avatar{width:72px;height:72px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;box-shadow:0 8px 32px rgba(61,90,62,.25);}
 .det-name{font-size:24px;font-weight:700;letter-spacing:-.4px;}
-.det-role{
-  font-size:11px;font-weight:600;text-transform:uppercase;
-  letter-spacing:.08em;color:var(--accent);
-  background:var(--green-light);padding:3px 10px;border-radius:99px;
-}
+.det-role{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);background:var(--green-light);padding:3px 10px;border-radius:99px;}
 .det-msg{font-size:13px;color:var(--text-2);}
-.det-btn{
-  margin-top:4px;
-  background:var(--accent);color:#fff;
-  border:none;border-radius:var(--r);
-  font-family:var(--font);font-size:13px;font-weight:600;
-  padding:11px 28px;cursor:pointer;
-  transition:background .2s,transform .1s,box-shadow .2s;
-  box-shadow:0 4px 16px rgba(61,90,62,.2);
-}
-.det-btn:hover{background:var(--accent-hover);box-shadow:0 6px 20px rgba(61,90,62,.3);}
+.det-btn{margin-top:4px;background:var(--accent);color:#fff;border:none;border-radius:var(--r);font-family:var(--font);font-size:13px;font-weight:600;padding:11px 28px;cursor:pointer;transition:background .2s,transform .1s,box-shadow .2s;box-shadow:0 4px 16px rgba(61,90,62,.2);}
+.det-btn:hover{background:var(--accent-hover);}
 .det-btn:active{transform:scale(.97);}
 
-/* ══════════════════════════════════════════════
-   SCAN OVERLAY
-══════════════════════════════════════════════ */
-.scan-overlay{
-  display:none;position:fixed;inset:0;z-index:1000;
-  background:rgba(245,242,236,.88);backdrop-filter:blur(20px);
-  align-items:center;justify-content:center;flex-direction:column;gap:16px;
-}
+/* ══ SCAN OVERLAY ══ */
+.scan-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(245,242,236,.88);backdrop-filter:blur(20px);align-items:center;justify-content:center;flex-direction:column;gap:16px;}
 .scan-overlay.active{display:flex;}
 .scan-spinner{width:36px;height:36px;border-radius:50%;border:2px solid var(--border2);border-top-color:var(--accent);animation:spin .7s linear infinite;}
 .scan-label{font-size:13px;color:var(--text-2);font-weight:500;}
 .scan-bar-wrap{width:180px;height:2px;background:var(--border2);border-radius:99px;overflow:hidden;}
 .scan-bar{height:100%;width:0%;background:var(--accent);border-radius:99px;transition:width .08s linear;}
 
-/* ══════════════════════════════════════════════
-   APP LAYOUT
-══════════════════════════════════════════════ */
-#view-app{
-  position:fixed;inset:0;
-  display:none;
-  flex-direction:row;
-}
+/* ══ APP LAYOUT ══ */
+#view-app{position:fixed;inset:0;display:none;flex-direction:row;}
 #view-app.active{display:flex;}
 
-/* ── SIDEBAR ── */
-.sidebar{
-  width:var(--sidebar-w);flex-shrink:0;
-  background:var(--surface);
-  border-right:1px solid var(--border);
-  display:flex;flex-direction:column;
-  padding:0;
-  overflow:hidden;
-  z-index:10;
-}
-.sidebar-logo{
-  display:flex;align-items:center;gap:9px;
-  padding:16px 16px 12px;
-  border-bottom:1px solid var(--border);
-}
-.sidebar-logo-mark{
-  width:26px;height:26px;background:var(--accent);border-radius:7px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:12px;color:#fff;font-weight:700;flex-shrink:0;
-}
+/* ── Sidebar ── */
+.sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;z-index:10;}
+.sidebar-logo{display:flex;align-items:center;gap:9px;padding:16px 16px 12px;border-bottom:1px solid var(--border);}
+.sidebar-logo-mark{width:26px;height:26px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;font-weight:700;flex-shrink:0;}
 .sidebar-logo-name{font-weight:700;font-size:13px;letter-spacing:-.3px;}
-.sidebar-logo-badge{
-  margin-left:auto;
-  font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;
-  color:var(--green);background:var(--green-light);
-  padding:2px 6px;border-radius:99px;
-}
-
-.sidebar-nav{flex:1;padding:8px 8px;display:flex;flex-direction:column;gap:1px;overflow-y:auto;}
-.nav-section{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3);padding:10px 8px 4px;}
-.nav-item{
-  display:flex;align-items:center;gap:9px;
-  padding:7px 10px;border-radius:var(--r-sm);
-  cursor:pointer;color:var(--text-2);font-size:12px;font-weight:500;
-  transition:all .15s;position:relative;
-  border:none;background:transparent;width:100%;text-align:left;
-  font-family:var(--font);
-}
+.sidebar-logo-badge{margin-left:auto;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--green);background:var(--green-light);padding:2px 6px;border-radius:99px;}
+.sidebar-nav{flex:1;padding:8px;display:flex;flex-direction:column;gap:1px;overflow-y:auto;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:var(--r-sm);cursor:pointer;color:var(--text-2);font-size:12px;font-weight:500;transition:all .15s;border:none;background:transparent;width:100%;text-align:left;font-family:var(--font);}
 .nav-item:hover{background:var(--bg2);color:var(--text);}
 .nav-item.active{background:var(--green-light);color:var(--green);font-weight:600;}
-.nav-item.active .nav-icon{color:var(--green);}
 .nav-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
-.nav-badge{
-  margin-left:auto;font-size:10px;font-weight:600;
-  background:var(--green);color:#fff;
-  padding:1px 6px;border-radius:99px;
-}
-
-.sidebar-bottom{
-  padding:12px 8px;border-top:1px solid var(--border);
-}
-.sidebar-user{
-  display:flex;align-items:center;gap:9px;
-  padding:8px 10px;border-radius:var(--r-sm);
-  cursor:pointer;transition:background .15s;
-}
+.sidebar-bottom{padding:12px 8px;border-top:1px solid var(--border);}
+.sidebar-user{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--r-sm);cursor:pointer;transition:background .15s;}
 .sidebar-user:hover{background:var(--bg2);}
-.sidebar-avatar{
-  width:26px;height:26px;border-radius:50%;
-  background:var(--accent);color:#fff;
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:700;flex-shrink:0;
-}
+.sidebar-avatar{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
 .sidebar-user-info{flex:1;min-width:0;}
 .sidebar-user-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .sidebar-user-role{font-size:10px;color:var(--text-3);}
-.sidebar-logout{
-  background:transparent;border:none;cursor:pointer;
-  color:var(--text-3);font-size:14px;padding:4px;border-radius:5px;
-  transition:all .15s;
-}
+.sidebar-logout{background:transparent;border:none;cursor:pointer;color:var(--text-3);font-size:14px;padding:4px;border-radius:5px;transition:all .15s;}
 .sidebar-logout:hover{background:var(--red-light);color:var(--red);}
 
-/* ── MAIN AREA ── */
+/* ── Main area ── */
 .main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
 
-/* ── TOPBAR ── */
-.topbar{
-  height:var(--topbar-h);flex-shrink:0;
-  background:var(--surface);border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:12px;
-  padding:0 20px;
-}
-.topbar-breadcrumb{
-  display:flex;align-items:center;gap:6px;
-  font-size:13px;color:var(--text-2);
-}
+/* ── Topbar ── */
+.topbar{height:var(--topbar-h);flex-shrink:0;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:0 20px;}
+.topbar-breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-2);}
 .topbar-breadcrumb-sep{color:var(--text-3);}
 .topbar-breadcrumb-current{color:var(--text);font-weight:600;}
 .topbar-spacer{flex:1;}
-.ws-indicator{
-  display:flex;align-items:center;gap:5px;
-  padding:4px 10px;border-radius:99px;
-  background:var(--bg2);border:1px solid var(--border);
-  font-size:11px;color:var(--text-2);font-weight:500;
-}
+.ws-indicator{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:99px;background:var(--bg2);border:1px solid var(--border);font-size:11px;color:var(--text-2);font-weight:500;}
 .ws-dot{width:6px;height:6px;border-radius:50%;background:var(--text-3);transition:background .3s;}
 .ws-dot.on{background:var(--green);animation:pulse 2s ease-in-out infinite;}
 .ws-dot.err{background:var(--red);}
-.topbar-session{
-  font-family:var(--mono);font-size:11px;color:var(--text-3);
-  display:flex;align-items:center;gap:5px;
-}
+.topbar-session{font-family:var(--mono);font-size:11px;color:var(--text-3);display:flex;align-items:center;gap:5px;}
 .session-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
 
-/* ── CONTENT ── */
+/* ── Content ── */
 .content{flex:1;display:flex;overflow:hidden;}
-
-/* ── CANVAS AREA ── */
 .canvas-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
 
-/* stats bar */
+/* ══ STATS BAR — 2 filas (una por sala) ══ */
 .stats-bar{
-  display:flex;gap:1px;
-  background:var(--border);
-  border-bottom:1px solid var(--border);
+  display:flex;flex-direction:column;
+  background:var(--surface);border-bottom:1px solid var(--border);
   flex-shrink:0;
 }
+.stats-row{display:flex;align-items:stretch;border-bottom:1px solid var(--border);}
+.stats-row:last-child{border-bottom:none;}
+.stats-row-label{
+  width:108px;flex-shrink:0;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:8px 14px;
+  border-right:1px solid var(--border);
+  gap:3px;
+}
+.stats-sala-name{font-size:11px;font-weight:700;color:var(--text);}
+.stats-sala-dot{
+  display:inline-block;width:7px;height:7px;border-radius:50%;
+  margin-right:5px;flex-shrink:0;
+}
+.stats-sala-dot.sp1{background:var(--green);}
+.stats-sala-dot.sp2{background:var(--blue);}
+.sala-lock-chip{
+  font-size:9px;font-weight:600;padding:2px 6px;border-radius:99px;
+  display:inline-flex;align-items:center;gap:3px;margin-top:2px;width:fit-content;
+}
+.sala-lock-chip.locked{background:var(--red-light);color:var(--red);}
+.sala-lock-chip.unlocked{background:var(--green-light);color:var(--green);}
 .stat-item{
-  flex:1;background:var(--surface);
-  padding:12px 16px;
-  display:flex;align-items:center;gap:10px;
-  transition:background .15s;
+  flex:1;background:var(--surface);padding:8px 14px;
+  display:flex;align-items:center;gap:9px;
+  border-right:1px solid var(--border);transition:background .15s;
 }
+.stat-item:last-child{border-right:none;}
 .stat-item:hover{background:var(--surface2);}
-.stat-icon-wrap{
-  width:32px;height:32px;border-radius:8px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:14px;flex-shrink:0;
-}
+.stat-icon-wrap{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
 .stat-icon-wrap.g{background:var(--green-light);}
 .stat-icon-wrap.r{background:var(--red-light);}
 .stat-icon-wrap.b{background:var(--blue-light);}
 .stat-icon-wrap.a{background:var(--amber-light);}
-.stat-val{font-size:20px;font-weight:700;letter-spacing:-.5px;line-height:1;}
+.stat-val{font-size:18px;font-weight:700;letter-spacing:-.4px;line-height:1;}
 .stat-val.g{color:var(--green);}
 .stat-val.r{color:var(--red);}
 .stat-val.b{color:var(--blue);}
 .stat-val.a{color:var(--amber);}
-.stat-lbl{font-size:11px;color:var(--text-3);margin-top:1px;}
+.stat-lbl{font-size:10px;color:var(--text-3);margin-top:1px;}
+.stat-item.faded{opacity:.45;}
 
-/* canvas header */
-.canvas-header{
-  display:flex;align-items:center;gap:12px;
-  padding:12px 20px;border-bottom:1px solid var(--border);
-  background:var(--surface);flex-shrink:0;
-}
+/* ── Canvas header ── */
+.canvas-header{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
 .canvas-title{font-size:13px;font-weight:600;}
 .canvas-sub{font-size:11px;color:var(--text-3);margin-left:4px;}
 .canvas-spacer{flex:1;}
 .legend{display:flex;gap:12px;align-items:center;}
 .leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-2);}
 .leg-dot{width:8px;height:8px;border-radius:3px;}
-.leg-dot.libre{background:#6DBF7A;box-shadow:0 0 0 2px rgba(109,191,122,.2);}
-.leg-dot.ocupado{background:#E07070;box-shadow:0 0 0 2px rgba(224,112,112,.2);}
-.leg-dot.reservado{background:#8B83E8;box-shadow:0 0 0 2px rgba(139,131,232,.2);}
+.leg-dot.libre{background:#6DBF7A;}
+.leg-dot.ocupado{background:#E07070;}
+.leg-dot.cerrado{background:#C0BABA;}
 
-/* zone grid */
-.zone-grid-wrap{
-  flex:1;overflow-y:auto;
-  padding:20px;
-  background:var(--bg);
-}
-.zone-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r-lg);overflow:hidden;
-  cursor:pointer;
-  transition:box-shadow .2s,transform .15s;
-  animation:fadeIn .3s ease both;
-}
-.zone-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.08);transform:translateY(-1px);}
-.zone-card-head{
-  display:flex;align-items:center;gap:12px;
-  padding:14px 16px;border-bottom:1px solid var(--border);
-}
+/* ── Zone grid ── */
+.zone-grid-wrap{flex:1;overflow-y:auto;padding:20px;background:var(--bg);}
+.zone-cards-row{display:flex;gap:16px;max-width:840px;margin:0 auto;}
+.zone-card{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:box-shadow .2s,transform .15s;animation:fadeIn .3s ease both;}
+.zone-card.clickable{cursor:pointer;}
+.zone-card.clickable:hover{box-shadow:0 4px 20px rgba(0,0,0,.08);transform:translateY(-1px);}
+.zone-card.locked-card{opacity:.6;cursor:default;}
+.zone-card-head{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);}
 .zone-card-icon{font-size:18px;}
 .zone-card-name{font-size:13px;font-weight:600;flex:1;}
-.zone-card-badge{
-  font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;
-}
+.zone-card-badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;}
 .zone-card-badge.libre{background:var(--green-light);color:var(--green);}
 .zone-card-badge.parcial{background:var(--amber-light);color:var(--amber);}
 .zone-card-badge.ocupado{background:var(--red-light);color:var(--red);}
+.zone-card-badge.cerrado{background:#EDE9E9;color:#888;}
 .zone-card-body{padding:12px 16px;}
 .zone-card-meta{font-size:11px;color:var(--text-2);margin-bottom:8px;}
+.zone-card-meta.muted{color:var(--text-3);}
 .zone-bar{height:3px;background:var(--bg2);border-radius:99px;overflow:hidden;}
 .zone-bar-fill{height:100%;border-radius:99px;transition:width .4s ease;}
 .zone-bar-fill.libre{background:var(--green);}
 .zone-bar-fill.parcial{background:var(--amber);}
 .zone-bar-fill.ocupado{background:var(--red);}
-.zone-card-arrow{
-  display:flex;align-items:center;justify-content:flex-end;
-  padding:8px 16px 12px;
-  font-size:11px;color:var(--text-3);font-weight:500;
-}
+.zone-card-footer{display:flex;align-items:center;justify-content:flex-end;padding:8px 16px 12px;font-size:11px;color:var(--text-3);font-weight:500;}
+.zone-unlock-hint{font-size:11px;color:var(--text-3);margin-top:6px;display:flex;align-items:center;gap:5px;}
+.zone-unlock-bar{height:3px;background:var(--bg2);border-radius:99px;overflow:hidden;margin-top:4px;}
+.zone-unlock-fill{height:100%;background:var(--amber);border-radius:99px;transition:width .4s;}
 
-/* sala view */
+/* ── Sala view ── */
 .sala-view{display:none;flex-direction:column;flex:1;overflow:hidden;}
 .sala-view.show{display:flex;}
 .zone-grid-wrap.hide{display:none;}
-
-.sala-nav{
-  display:flex;align-items:center;gap:10px;
-  padding:12px 20px;border-bottom:1px solid var(--border);
-  background:var(--surface);flex-shrink:0;
-}
-.btn-back{
-  display:flex;align-items:center;gap:5px;
-  font-size:12px;font-weight:500;color:var(--text-2);
-  background:var(--bg2);border:1px solid var(--border2);
-  border-radius:var(--r-sm);padding:5px 10px;cursor:pointer;
-  transition:all .15s;
-}
+.sala-nav{display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;}
+.btn-back{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--text-2);background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r-sm);padding:5px 10px;cursor:pointer;transition:all .15s;}
 .btn-back:hover{background:var(--surface3);color:var(--text);}
 .sala-nav-title{font-size:13px;font-weight:600;}
-.sala-nav-badge{
-  font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;
-}
+.sala-nav-badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;}
 .sala-nav-badge.libre{background:var(--green-light);color:var(--green);}
 .sala-nav-badge.parcial{background:var(--amber-light);color:var(--amber);}
 .sala-nav-badge.ocupado{background:var(--red-light);color:var(--red);}
-
 .sala-canvas{flex:1;overflow-y:auto;padding:24px;background:var(--bg);}
 .sala-stats-mini{display:flex;gap:10px;margin-bottom:20px;}
-.sala-stat{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r);padding:10px 16px;
-  display:flex;align-items:center;gap:8px;
-}
+.sala-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 16px;display:flex;align-items:center;gap:8px;}
 .sala-stat-val{font-size:18px;font-weight:700;}
 .sala-stat-val.g{color:var(--green);}
 .sala-stat-val.r{color:var(--red);}
 .sala-stat-lbl{font-size:10px;color:var(--text-3);margin-top:1px;}
+.sala-consumption-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 16px;display:flex;align-items:center;gap:12px;font-size:11px;color:var(--text-2);}
+.sala-consumption-bar strong{color:var(--text);}
 
-/* oficina layout */
-.oficina{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r-lg);overflow:hidden;
-}
-.oficina-wall-top{
-  background:var(--accent);height:6px;
-}
+/* ── Plano de sala ── */
+.oficina{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;}
+.oficina-wall-top{background:var(--accent);height:6px;}
 .oficina-body{padding:24px;}
-.pizarra{
-  background:linear-gradient(135deg,#2C4A2E,#3D5A3E);
-  border-radius:8px;height:28px;
-  display:flex;align-items:center;justify-content:center;
-  margin-bottom:28px;
-}
+.pizarra{background:linear-gradient(135deg,#2C4A2E,#3D5A3E);border-radius:8px;height:28px;display:flex;align-items:center;justify-content:center;margin-bottom:28px;}
 .pizarra-txt{font-size:10px;color:rgba(255,255,255,.5);letter-spacing:.12em;text-transform:uppercase;}
-.fila-label{
-  font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--text-3);text-align:center;margin-bottom:10px;
-}
+.fila-label{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);text-align:center;margin-bottom:10px;}
 .fila{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:8px;}
-.pasillo{
-  display:flex;align-items:center;gap:10px;margin:16px 0;
-}
+.pasillo{display:flex;align-items:center;gap:10px;margin:16px 0;}
 .pasillo-line{flex:1;height:1px;border-top:1.5px dashed var(--border2);}
 .pasillo-label{font-size:9px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;flex-shrink:0;}
 
-/* puesto */
-.puesto{
-  display:flex;flex-direction:column;align-items:center;gap:4px;
-  cursor:pointer;transition:transform .15s;
-}
+/* ── Puesto ── */
+.puesto{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:transform .15s;}
 .puesto:hover{transform:translateY(-3px);}
-.puesto-mesa{
-  width:58px;height:38px;border-radius:8px;
-  border:1.5px solid;position:relative;
-  transition:box-shadow .15s;
-}
+.puesto-mesa{width:58px;height:38px;border-radius:8px;border:1.5px solid;position:relative;transition:box-shadow .15s;}
 .puesto:hover .puesto-mesa{box-shadow:0 6px 16px rgba(0,0,0,.12);}
-.puesto-screen{
-  position:absolute;top:7px;left:50%;transform:translateX(-50%);
-  width:18px;height:12px;border-radius:2px;border:1.5px solid rgba(0,0,0,.12);
-}
+.puesto-screen{position:absolute;top:7px;left:50%;transform:translateX(-50%);width:18px;height:12px;border-radius:2px;border:1.5px solid rgba(0,0,0,.12);}
 .puesto-chair{width:28px;height:12px;border-radius:4px 4px 8px 8px;border:1.5px solid;}
 .puesto-code{font-size:9px;color:var(--text-3);font-family:var(--mono);}
-.puesto-status-dot{
-  width:7px;height:7px;border-radius:50%;
-  position:absolute;top:-3px;right:-3px;
-  border:1.5px solid var(--surface);
-}
-
-/* estados */
+.puesto-status-dot{width:7px;height:7px;border-radius:50%;position:absolute;top:-3px;right:-3px;border:1.5px solid var(--surface);}
 .puesto.libre .puesto-mesa{background:#C8EAD0;border-color:#7DC48A;box-shadow:0 2px 0 #5A9060;}
 .puesto.libre .puesto-screen{background:#5EAF6E;}
-.puesto.libre .puesto-chair{background:#9AD4A6;border-color:#5A9060;box-shadow:0 2px 0 rgba(60,130,70,.25);}
+.puesto.libre .puesto-chair{background:#9AD4A6;border-color:#5A9060;}
 .puesto.libre .puesto-status-dot{background:var(--green);}
 .puesto.ocupado .puesto-mesa{background:#F5BABA;border-color:#D07070;box-shadow:0 2px 0 #A05050;}
 .puesto.ocupado .puesto-screen{background:#C05050;}
-.puesto.ocupado .puesto-chair{background:#E09090;border-color:#A05050;box-shadow:0 2px 0 rgba(160,60,60,.25);}
+.puesto.ocupado .puesto-chair{background:#E09090;border-color:#A05050;}
 .puesto.ocupado .puesto-status-dot{background:var(--red);}
-.puesto.reservado .puesto-mesa{background:#DDD9F8;border-color:#A09AEC;box-shadow:0 2px 0 #7870CC;}
-.puesto.reservado .puesto-screen{background:#8078D8;}
-.puesto.reservado .puesto-chair{background:#B8B2F0;border-color:#7870CC;box-shadow:0 2px 0 rgba(120,112,204,.25);}
-.puesto.reservado .puesto-status-dot{background:#8078D8;animation:pulse 1.5s ease-in-out infinite;}
 
-/* ── RIGHT PANEL ── */
-.right-panel{
-  width:280px;flex-shrink:0;
-  background:var(--surface);border-left:1px solid var(--border);
-  display:flex;flex-direction:column;overflow:hidden;
-}
-.rp-header{
-  padding:14px 16px 12px;border-bottom:1px solid var(--border);
-  font-size:12px;font-weight:600;color:var(--text);
-  display:flex;align-items:center;justify-content:space-between;
-}
+/* ── Right Panel ── */
+.right-panel{width:260px;flex-shrink:0;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.rp-header{padding:14px 16px 12px;border-bottom:1px solid var(--border);font-size:12px;font-weight:600;color:var(--text);display:flex;align-items:center;justify-content:space-between;}
 .rp-header-sub{font-size:10px;color:var(--text-3);font-weight:400;}
 .rp-body{flex:1;overflow-y:auto;padding:12px;}
 .rp-section{margin-bottom:16px;}
-.rp-section-title{
-  font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
-  color:var(--text-3);margin-bottom:8px;
-  display:flex;align-items:center;gap:6px;
-}
+.rp-section-title{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
 .rp-section-title::after{content:'';flex:1;height:1px;background:var(--border);}
-
-/* availability items */
-.avail-item{
-  display:flex;align-items:center;gap:10px;
-  padding:8px 10px;border-radius:var(--r-sm);
-  cursor:pointer;transition:background .15s;
-  border-left:2px solid transparent;margin-bottom:4px;
-}
-.avail-item:hover{background:var(--bg2);}
-.avail-item.libre{border-left-color:var(--green);}
-.avail-item.parcial{border-left-color:var(--amber);}
-.avail-item.ocupado{border-left-color:var(--red);}
-.avail-item-name{font-size:12px;font-weight:500;color:var(--text);flex:1;}
-.avail-item-meta{font-size:10px;color:var(--text-3);}
-.avail-item-badge{
-  font-size:9px;font-weight:600;padding:2px 7px;border-radius:99px;flex-shrink:0;
-}
-.avail-item-badge.libre{background:var(--green-light);color:var(--green);}
-.avail-item-badge.parcial{background:var(--amber-light);color:var(--amber);}
-.avail-item-badge.ocupado{background:var(--red-light);color:var(--red);}
-
-/* live feed */
-.live-item{
-  display:flex;align-items:flex-start;gap:8px;
-  padding:8px 0;border-bottom:1px solid var(--border);
-}
+.live-item{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);}
 .live-item:last-child{border-bottom:none;}
-.live-avatar{
-  width:24px;height:24px;border-radius:50%;
-  background:var(--accent);color:#fff;
-  display:flex;align-items:center;justify-content:center;
-  font-size:10px;font-weight:700;flex-shrink:0;
-}
+.live-avatar{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
+.live-avatar.sp2{background:var(--blue);}
 .live-text{font-size:11px;color:var(--text-2);line-height:1.5;}
 .live-text strong{color:var(--text);}
 .live-time{font-size:10px;color:var(--text-3);margin-top:1px;}
 .live-empty{font-size:11px;color:var(--text-3);text-align:center;padding:16px 0;}
 
-/* ── MODAL ── */
-.modal-backdrop{
-  display:none;position:fixed;inset:0;z-index:500;
-  background:rgba(28,26,22,.4);backdrop-filter:blur(8px);
-  align-items:center;justify-content:center;padding:20px;
-}
+/* ── Modal ── */
+.modal-backdrop{display:none;position:fixed;inset:0;z-index:500;background:rgba(28,26,22,.4);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;}
 .modal-backdrop.active{display:flex;}
-.modal{
-  background:var(--surface);border:1px solid var(--border2);
-  border-radius:var(--r-lg);width:100%;max-width:360px;
-  box-shadow:0 20px 60px rgba(0,0,0,.15);
-  animation:scaleIn .25s cubic-bezier(.16,1,.3,1) both;
-}
-.modal-head{
-  display:flex;align-items:flex-start;justify-content:space-between;
-  padding:18px 20px 14px;border-bottom:1px solid var(--border);
-}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-lg);width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.15);animation:scaleIn .25s cubic-bezier(.16,1,.3,1) both;}
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid var(--border);}
 .modal-title{font-size:14px;font-weight:700;letter-spacing:-.2px;}
 .modal-subtitle{font-size:11px;color:var(--text-2);margin-top:2px;}
-.modal-close{
-  width:26px;height:26px;border-radius:6px;border:1px solid var(--border);
-  background:var(--bg2);cursor:pointer;font-size:13px;color:var(--text-2);
-  display:flex;align-items:center;justify-content:center;
-  transition:all .15s;flex-shrink:0;
-}
+.modal-close{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);cursor:pointer;font-size:13px;color:var(--text-2);display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;}
 .modal-close:hover{background:var(--red-light);border-color:var(--red);color:var(--red);}
 .modal-body{padding:16px 20px;}
-.modal-status{
-  display:flex;align-items:center;gap:8px;
-  padding:10px 12px;border-radius:var(--r-sm);
-  margin-bottom:14px;border:1px solid;
-}
+.modal-status{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:var(--r-sm);margin-bottom:14px;border:1px solid;}
 .modal-status.libre{background:var(--green-light);border-color:var(--green-mid);}
 .modal-status.ocupado{background:var(--red-light);border-color:#F5C0C0;}
 .modal-status.parcial{background:var(--amber-light);border-color:#F0D090;}
-.modal-status.reservado{background:#EEEAFC;border-color:#C0BAF5;}
+.modal-status.cerrado{background:#F0EDED;border-color:#DDD8D8;}
 .modal-st-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;animation:pulse 2s ease-in-out infinite;}
 .libre .modal-st-dot{background:var(--green);}
 .ocupado .modal-st-dot{background:var(--red);}
 .parcial .modal-st-dot{background:var(--amber);}
-.reservado .modal-st-dot{background:#7870D8;}
+.cerrado .modal-st-dot{background:#AAA;animation:none;}
 .modal-st-label{font-size:12px;font-weight:600;flex:1;}
 .libre .modal-st-label{color:var(--green);}
 .ocupado .modal-st-label{color:var(--red);}
 .parcial .modal-st-label{color:var(--amber);}
-.reservado .modal-st-label{color:#5850C0;}
+.cerrado .modal-st-label{color:#888;}
 .modal-st-occ{font-family:var(--mono);font-size:10px;color:var(--text-3);}
-.modal-facts{display:flex;flex-direction:column;gap:7px;margin-bottom:6px;}
+.modal-facts{display:flex;flex-direction:column;gap:7px;margin-bottom:10px;}
 .modal-fact{display:flex;align-items:center;justify-content:space-between;font-size:12px;}
 .modal-fact-key{color:var(--text-2);}
 .modal-fact-val{font-weight:600;font-family:var(--mono);font-size:11px;}
-.modal-timer{text-align:center;font-size:11px;color:#5850C0;font-weight:600;min-height:16px;margin-top:8px;font-family:var(--mono);}
+.modal-energy-box{background:var(--bg2);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:4px;font-size:11px;}
+.modal-energy-title{font-weight:600;color:var(--text-2);margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.modal-energy-row{display:flex;justify-content:space-between;color:var(--text-3);margin-top:3px;}
+.modal-energy-row strong{color:var(--text-2);}
 .modal-actions{display:flex;flex-direction:column;gap:6px;padding:0 20px 18px;}
-.modal-btn{
-  width:100%;padding:9px 14px;border-radius:var(--r-sm);
-  border:1px solid;cursor:pointer;font-family:var(--font);
-  font-size:12px;font-weight:600;transition:all .15s;
-}
+.modal-btn{width:100%;padding:9px 14px;border-radius:var(--r-sm);border:1px solid;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;transition:all .15s;}
 .modal-btn:disabled{opacity:.35;cursor:not-allowed;}
-.btn-reserve{border-color:var(--border2);background:var(--bg2);color:var(--text);}
-.btn-reserve:hover:not(:disabled){border-color:var(--accent);background:var(--green-light);color:var(--accent);}
-.btn-checkin,.btn-confirm{border-color:var(--green-mid);background:var(--green-light);color:var(--green);}
-.btn-checkin:hover:not(:disabled),.btn-confirm:hover:not(:disabled){background:#D8F0DB;}
+.btn-checkin{border-color:var(--green-mid);background:var(--green-light);color:var(--green);}
+.btn-checkin:hover:not(:disabled){background:#D8F0DB;}
 .btn-checkout{border-color:#F5C0C0;background:var(--red-light);color:var(--red);}
 .btn-checkout:hover:not(:disabled){background:#F8D5D5;}
 .modal-feedback{text-align:center;font-size:11px;font-weight:500;min-height:16px;padding:0 20px 4px;}
 .modal-feedback.ok{color:var(--green);}
 .modal-feedback.err{color:var(--red);}
 
-/* ── TOOLTIP ── */
-#tooltip{
-  display:none;position:fixed;z-index:700;
-  background:var(--surface);border:1px solid var(--border2);
-  border-radius:var(--r-sm);padding:8px 12px;
-  font-size:11px;pointer-events:none;
-  box-shadow:0 4px 20px rgba(0,0,0,.1);min-width:140px;
-}
+/* ── Tooltip ── */
+#tooltip{display:none;position:fixed;z-index:700;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);padding:8px 12px;font-size:11px;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.1);min-width:140px;}
 #tooltip.show{display:block;}
 .tt-name{font-weight:600;color:var(--text);margin-bottom:4px;}
 .tt-row{display:flex;justify-content:space-between;gap:14px;color:var(--text-2);margin-top:2px;}
 .tt-val{color:var(--text);font-weight:500;}
 
-/* ── LOADING ── */
-.loading-overlay{
-  display:none;position:fixed;inset:0;z-index:200;
-  background:rgba(245,242,236,.7);backdrop-filter:blur(4px);
-  align-items:center;justify-content:center;
-}
+/* ── Loading ── */
+.loading-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(245,242,236,.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;}
 .loading-overlay.active{display:flex;}
 .loading-spinner{width:28px;height:28px;border-radius:50%;border:2px solid var(--border2);border-top-color:var(--accent);animation:spin .7s linear infinite;}
 
-/* scrollbar */
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px;}
 </style>
@@ -639,24 +345,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
     </div>
     <div class="kiosko-time" id="clock-kiosko"></div>
   </div>
-
   <div class="kiosko-center" id="kiosko-wait">
     <div class="nfc-visual">
-      <div class="nfc-ring"></div>
-      <div class="nfc-ring"></div>
-      <div class="nfc-ring"></div>
+      <div class="nfc-ring"></div><div class="nfc-ring"></div><div class="nfc-ring"></div>
       <div class="nfc-core">📡</div>
     </div>
     <div class="kiosko-text">
       <div class="kiosko-title">Acerca tu tarjeta</div>
-      <div class="kiosko-sub">Identifícate para acceder al sistema<br>de gestión de espacios</div>
+      <div class="kiosko-sub">Identifícate para acceder al sistema<br>de gestión de salas de profesores</div>
       <div class="kiosko-pill">
         <div class="kiosko-pill-dot"></div>
         <span id="kiosko-status">Esperando tarjeta NFC…</span>
       </div>
     </div>
   </div>
-
   <div class="kiosko-detected" id="kiosko-detected">
     <div class="det-avatar" id="det-avatar">?</div>
     <div class="det-name" id="det-name">—</div>
@@ -686,11 +388,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
     <div class="sidebar-logo">
       <div class="sidebar-logo-mark">D</div>
       <div class="sidebar-logo-name">DeskFlow</div>
-      <div class="sidebar-logo-badge" id="ws-badge">●&nbsp;Live</div>
+      <div class="sidebar-logo-badge" id="ws-badge">● Live</div>
     </div>
     <nav class="sidebar-nav">
       <button class="nav-item active">
-        <span class="nav-icon">🗺️</span> Planta
+        <span class="nav-icon">🗺️</span> Salas
       </button>
     </nav>
     <div class="sidebar-bottom">
@@ -713,7 +415,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
       <div class="topbar-breadcrumb">
         <span>DeskFlow</span>
         <span class="topbar-breadcrumb-sep">/</span>
-        <span class="topbar-breadcrumb-current" id="tb-section">Planta</span>
+        <span class="topbar-breadcrumb-current" id="tb-section">Salas de Profesores</span>
       </div>
       <div class="topbar-spacer"></div>
       <div class="topbar-session">
@@ -732,44 +434,78 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
       <!-- CANVAS -->
       <div class="canvas-area">
 
-        <!-- stats bar -->
+        <!-- Stats Bar: 2 filas, una por sala -->
         <div class="stats-bar">
-          <div class="stat-item">
-            <div class="stat-icon-wrap g">✅</div>
-            <div><div class="stat-val g" id="stat-free">—</div><div class="stat-lbl">Libres</div></div>
+          <!-- Fila Sala 1 -->
+          <div class="stats-row">
+            <div class="stats-row-label">
+              <div class="stats-sala-name">
+                <span class="stats-sala-dot sp1"></span>Sala 1
+              </div>
+              <div class="sala-lock-chip unlocked" id="s1-chip">🟢 Abierta</div>
+            </div>
+            <div class="stat-item" id="s1-item-free">
+              <div class="stat-icon-wrap g">✅</div>
+              <div><div class="stat-val g" id="s1-free">—</div><div class="stat-lbl">Libres</div></div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-icon-wrap r">🔴</div>
+              <div><div class="stat-val r" id="s1-occ">—</div><div class="stat-lbl">Ocupados</div></div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-icon-wrap b">📍</div>
+              <div><div class="stat-val b" id="s1-total">—</div><div class="stat-lbl">Total</div></div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-icon-wrap a">📊</div>
+              <div><div class="stat-val a" id="s1-pct">—</div><div class="stat-lbl">Ocupación</div></div>
+            </div>
           </div>
-          <div class="stat-item">
-            <div class="stat-icon-wrap r">🔴</div>
-            <div><div class="stat-val r" id="stat-occ">—</div><div class="stat-lbl">Ocupados</div></div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-icon-wrap b">📍</div>
-            <div><div class="stat-val b" id="stat-total">—</div><div class="stat-lbl">Total</div></div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-icon-wrap a">📊</div>
-            <div><div class="stat-val a" id="stat-pct">—</div><div class="stat-lbl">Ocupación</div></div>
+          <!-- Fila Sala 2 -->
+          <div class="stats-row" id="s2-row">
+            <div class="stats-row-label">
+              <div class="stats-sala-name">
+                <span class="stats-sala-dot sp2"></span>Sala 2
+              </div>
+              <div class="sala-lock-chip locked" id="s2-chip">🔒 Cerrada</div>
+            </div>
+            <div class="stat-item faded" id="s2-item-free">
+              <div class="stat-icon-wrap g">✅</div>
+              <div><div class="stat-val g" id="s2-free">—</div><div class="stat-lbl">Libres</div></div>
+            </div>
+            <div class="stat-item faded">
+              <div class="stat-icon-wrap r">🔴</div>
+              <div><div class="stat-val r" id="s2-occ">—</div><div class="stat-lbl">Ocupados</div></div>
+            </div>
+            <div class="stat-item faded">
+              <div class="stat-icon-wrap b">📍</div>
+              <div><div class="stat-val b" id="s2-total">—</div><div class="stat-lbl">Total</div></div>
+            </div>
+            <div class="stat-item faded">
+              <div class="stat-icon-wrap a">📊</div>
+              <div><div class="stat-val a" id="s2-pct">—</div><div class="stat-lbl">Ocupación</div></div>
+            </div>
           </div>
         </div>
 
-        <!-- canvas header -->
+        <!-- Canvas header -->
         <div class="canvas-header">
           <div>
-            <span class="canvas-title" id="canvas-title">Sala de trabajo</span>
-            <span class="canvas-sub" id="canvas-sub">Haz clic en un puesto para gestionarlo</span>
+            <span class="canvas-title" id="canvas-title">Salas de Profesores</span>
+            <span class="canvas-sub" id="canvas-sub">Haz clic en una sala para ver los puestos</span>
           </div>
           <div class="canvas-spacer"></div>
           <div class="legend">
             <div class="leg-item"><div class="leg-dot libre"></div>Libre</div>
             <div class="leg-item"><div class="leg-dot ocupado"></div>Ocupado</div>
-            <div class="leg-item"><div class="leg-dot reservado"></div>Reservado</div>
+            <div class="leg-item"><div class="leg-dot cerrado"></div>Cerrada</div>
           </div>
         </div>
 
-        <!-- zone grid -->
+        <!-- Zone grid -->
         <div class="zone-grid-wrap" id="zone-grid"></div>
 
-        <!-- sala view -->
+        <!-- Sala view -->
         <div class="sala-view" id="sala-view">
           <div class="sala-nav">
             <button class="btn-back" onclick="closeSala()">← Volver</button>
@@ -781,19 +517,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 
       </div>
 
-      <!-- RIGHT PANEL -->
+      <!-- RIGHT PANEL: solo actividad reciente -->
       <div class="right-panel">
         <div class="rp-header">
-          Disponibilidad
+          Actividad reciente
           <span class="rp-header-sub" id="rp-sub">En tiempo real</span>
         </div>
         <div class="rp-body">
           <div class="rp-section">
-            <div class="rp-section-title">Zonas</div>
-            <div id="avail-list"></div>
-          </div>
-          <div class="rp-section">
-            <div class="rp-section-title">Actividad reciente</div>
+            <div class="rp-section-title">Últimos eventos</div>
             <div id="live-feed"></div>
           </div>
         </div>
@@ -820,16 +552,40 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
         <span class="modal-st-occ" id="modal-st-occ">—</span>
       </div>
       <div class="modal-facts">
-        <div class="modal-fact"><span class="modal-fact-key">Capacidad</span><span class="modal-fact-val" id="modal-cap">—</span></div>
-        <div class="modal-fact"><span class="modal-fact-key">Zona</span><span class="modal-fact-val" id="modal-zone">—</span></div>
+        <div class="modal-fact">
+          <span class="modal-fact-key">Capacidad</span>
+          <span class="modal-fact-val" id="modal-cap">—</span>
+        </div>
+        <div class="modal-fact">
+          <span class="modal-fact-key">Sala</span>
+          <span class="modal-fact-val" id="modal-zone">—</span>
+        </div>
       </div>
-      <div class="modal-timer" id="modal-timer"></div>
+      <!-- Consumo estimado por puesto -->
+      <div class="modal-energy-box" id="modal-energy-box">
+        <div class="modal-energy-title">⚡ Consumo estimado por sesión</div>
+        <div class="modal-energy-row">
+          <span>PC sobremesa</span><strong>200 W</strong>
+        </div>
+        <div class="modal-energy-row">
+          <span>Monitor 24"</span><strong>30 W</strong>
+        </div>
+        <div class="modal-energy-row">
+          <span>Lámpara escritorio</span><strong>10 W</strong>
+        </div>
+        <div class="modal-energy-row" style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border2);">
+          <span style="font-weight:600;color:var(--text);">Total puesto</span>
+          <strong style="color:var(--amber);">240 W · 0,24 kWh/h</strong>
+        </div>
+      </div>
     </div>
     <div class="modal-actions">
-      <button class="modal-btn btn-reserve" id="btn-reserve" onclick="doReserve()">Reservar (5 min)</button>
-      <button class="modal-btn btn-confirm" id="btn-confirm" onclick="doConfirm()">✓ Confirmar reserva</button>
-      <button class="modal-btn btn-checkin" id="btn-checkin" onclick="doCheckin()">Entrar al puesto</button>
-      <button class="modal-btn btn-checkout" id="btn-checkout" onclick="doCheckout()">Salir del puesto</button>
+      <button class="modal-btn btn-checkin" id="btn-checkin" onclick="doCheckin()">
+        ▶ Entrar al puesto
+      </button>
+      <button class="modal-btn btn-checkout" id="btn-checkout" onclick="doCheckout()">
+        ■ Salir del puesto
+      </button>
     </div>
     <div class="modal-feedback" id="modal-feedback"></div>
   </div>
@@ -843,440 +599,483 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 </div>
 
 <script>
-const API='http://localhost:8000', WS_URL='ws://localhost:8000/ws';
-let token=null, currentUser=null;
-let sessionStart=null, sessionIv=null, ws=null, pollingIv=null;
-let spacesCache={}, zonesCache={};
-let modalSpaceId=null, modalTimerIv=null, openZoneId=null;
-let liveEvents=[];
+/* ── Configuración ── */
+const API    = 'http://localhost:8000';
+const WS_URL = 'ws://localhost:8000/ws';
 
-const $$=id=>document.getElementById(id);
-const pad=n=>String(n).padStart(2,'0');
+/* ── Estado global ── */
+let token = null, currentUser = null;
+let sessionStart = null, sessionIv = null, ws = null, pollingIv = null;
+let spacesCache = {}, zonesCache = {};
+let modalSpaceId = null, openZoneId = null;
+let liveEvents = [];
 
-/* ── CLOCK ── */
-function tick(){
-  const t=new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  const el=$$('clock-kiosko');if(el)el.textContent=t;
+const $$ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, '0');
+
+/* ── Reloj ── */
+function tick() {
+  const t = new Date().toLocaleTimeString('es-ES', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const el = $$('clock-kiosko'); if (el) el.textContent = t;
 }
-setInterval(tick,1000);tick();
+setInterval(tick, 1000); tick();
 
-function updateSession(){
-  if(!sessionStart)return;
-  const s=Math.floor((Date.now()-sessionStart)/1000);
-  $$('session-time').textContent=`${pad(Math.floor(s/60))}:${pad(s%60)}`;
+function updateSession() {
+  if (!sessionStart) return;
+  const s = Math.floor((Date.now() - sessionStart) / 1000);
+  $$('session-time').textContent = `${pad(Math.floor(s/60))}:${pad(s%60)}`;
 }
 
-/* ── POLLING NFC ── */
-function startPolling(){
-  if(pollingIv)return;
-  pollingIv=setInterval(checkNfc,2000);
-}
-function stopPolling(){clearInterval(pollingIv);pollingIv=null;}
+/* ── NFC polling ── */
+function startPolling() { if (pollingIv) return; pollingIv = setInterval(checkNfc, 2000); }
+function stopPolling()  { clearInterval(pollingIv); pollingIv = null; }
 
-async function checkNfc(){
-  try{
-    const r=await fetch(`${API}/nfc/pending`);
-    const d=await r.json();
-    if(d.available&&d.access_token){
+async function checkNfc() {
+  try {
+    const r = await fetch(`${API}/nfc/pending`);
+    const d = await r.json();
+    if (d.available && d.access_token) {
       stopPolling();
-      token=d.access_token;currentUser=d.user;
+      token = d.access_token; currentUser = d.user;
       showDetected(d.user);
     }
-  }catch(_){}
+  } catch(_) {}
 }
 
-function showDetected(u){
+function showDetected(u) {
   $$('kiosko-wait').classList.add('hide');
-  $$('det-avatar').textContent=u.nombre[0].toUpperCase();
-  $$('det-name').textContent=`${u.nombre} ${u.apellidos}`;
-  $$('det-role').textContent=u.role;
+  $$('det-avatar').textContent  = u.nombre[0].toUpperCase();
+  $$('det-name').textContent    = `${u.nombre} ${u.apellidos}`;
+  $$('det-role').textContent    = u.role;
   $$('kiosko-detected').classList.add('show');
 }
 
-function enterApp(){playScan(showApp);}
+function enterApp() { playScan(showApp); }
 
-/* ── SCAN ANIMATION ── */
-function playScan(cb){
-  const ov=$$('scan-overlay');ov.classList.add('active');
-  const bar=$$('scan-bar'),lbl=$$('scan-label');
-  let pct=0;
-  const msgs=[[0,'Verificando identidad…'],[35,'Cargando espacios…'],[70,'Sincronizando datos…'],[90,'Listo']];
-  const iv=setInterval(()=>{
-    pct=Math.min(pct+Math.random()*4+2,100);
-    bar.style.width=pct+'%';
-    for(const[t,m]of msgs)if(pct>=t)lbl.textContent=m;
-    if(pct>=100){
-      clearInterval(iv);
-      setTimeout(()=>{ov.classList.remove('active');cb();},400);
-    }
-  },40);
+/* ── Animación de scan ── */
+function playScan(cb) {
+  const ov = $$('scan-overlay'); ov.classList.add('active');
+  const bar = $$('scan-bar'), lbl = $$('scan-label');
+  let pct = 0;
+  const msgs = [[0,'Verificando identidad…'],[35,'Cargando salas…'],[70,'Sincronizando…'],[90,'Listo']];
+  const iv = setInterval(() => {
+    pct = Math.min(pct + Math.random() * 4 + 2, 100);
+    bar.style.width = pct + '%';
+    for (const [t, m] of msgs) if (pct >= t) lbl.textContent = m;
+    if (pct >= 100) { clearInterval(iv); setTimeout(() => { ov.classList.remove('active'); cb(); }, 400); }
+  }, 40);
 }
 
-/* ── APP ── */
-async function showApp(){
-  const u=currentUser;
-  $$('sb-avatar').textContent=u.nombre[0].toUpperCase();
-  $$('sb-name').textContent=`${u.nombre} ${u.apellidos}`;
-  $$('sb-role').textContent=u.role;
+/* ── App init ── */
+async function showApp() {
+  const u = currentUser;
+  $$('sb-avatar').textContent = u.nombre[0].toUpperCase();
+  $$('sb-name').textContent   = `${u.nombre} ${u.apellidos}`;
+  $$('sb-role').textContent   = u.role;
   $$('view-kiosko').classList.remove('active');
   $$('view-app').classList.add('active');
-  sessionStart=Date.now();
-  sessionIv=setInterval(updateSession,1000);
+  sessionStart = Date.now();
+  sessionIv = setInterval(updateSession, 1000);
   await loadData();
   connectWS();
 }
 
-async function doLogout(){
-  try{await apiFetch('/auth/logout',{method:'POST'});}catch(_){}
+async function doLogout() {
+  try { await apiFetch('/auth/logout', {method:'POST'}); } catch(_) {}
   clearInterval(sessionIv);
-  if(ws){ws.close();ws=null;}
-  token=null;currentUser=null;spacesCache={};zonesCache={};
-  openZoneId=null;liveEvents=[];
+  if (ws) { ws.close(); ws = null; }
+  token = null; currentUser = null; spacesCache = {}; zonesCache = {};
+  openZoneId = null; liveEvents = [];
   setWsDot('off');
   $$('view-app').classList.remove('active');
   $$('view-kiosko').classList.add('active');
   $$('kiosko-wait').classList.remove('hide');
   $$('kiosko-detected').classList.remove('show');
-  $$('scan-bar').style.width='0%';
+  $$('scan-bar').style.width = '0%';
   startPolling();
 }
 
-async function apiFetch(path,opts={}){
-  const h={'Content-Type':'application/json',...(opts.headers||{})};
-  if(token)h['Authorization']=`Bearer ${token}`;
-  const r=await fetch(`${API}${path}`,{...opts,headers:h});
-  if(!r.ok){const e=await r.json().catch(()=>({detail:r.statusText}));throw new Error(e.detail);}
+async function apiFetch(path, opts = {}) {
+  const h = {'Content-Type':'application/json', ...(opts.headers||{})};
+  if (token) h['Authorization'] = `Bearer ${token}`;
+  const r = await fetch(`${API}${path}`, {...opts, headers: h});
+  if (!r.ok) { const e = await r.json().catch(() => ({detail:r.statusText})); throw new Error(e.detail); }
   return r.json();
 }
 
-async function loadData(){
+async function loadData() {
   $$('loading-overlay').classList.add('active');
-  try{
-    const[zones,spaces]=await Promise.all([apiFetch('/zones/'),apiFetch('/spaces/')]);
-    zonesCache={};spacesCache={};
-    zones.forEach(z=>zonesCache[z.id]=z);
-    spaces.forEach(s=>spacesCache[s.id]=s);
-    buildZoneGrid();buildAvailList();updateStats();
-  }catch(e){console.error(e);}
-  finally{$$('loading-overlay').classList.remove('active');}
+  try {
+    const [zones, spaces] = await Promise.all([apiFetch('/zones/'), apiFetch('/spaces/')]);
+    zonesCache = {}; spacesCache = {};
+    zones.forEach(z  => zonesCache[z.id] = z);
+    spaces.forEach(s => spacesCache[s.id] = s);
+    buildZoneGrid();
+    updateStats();
+  } catch(e) { console.error(e); }
+  finally { $$('loading-overlay').classList.remove('active'); }
 }
 
-/* ── WS ── */
-function connectWS(){
-  if(ws)ws.close();setWsDot('connecting');
-  ws=new WebSocket(`${WS_URL}?room=all`);
-  ws.onopen=()=>{
+/* ── WebSocket ── */
+function connectWS() {
+  if (ws) ws.close(); setWsDot('connecting');
+  ws = new WebSocket(`${WS_URL}?room=all`);
+  ws.onopen = () => {
     setWsDot('on');
-    setInterval(()=>{if(ws&&ws.readyState===1)ws.send('ping');},25000);
+    setInterval(() => { if (ws && ws.readyState === 1) ws.send('ping'); }, 25000);
   };
-  ws.onmessage=({data})=>{
-    try{
-      const{event,payload}=JSON.parse(data);
-      if(event==='space_updated'){
-        const prev=spacesCache[payload.id];
-        spacesCache[payload.id]=payload;
-        if(prev&&prev.status!==payload.status)addLiveEvent(payload);
-        apiFetch(`/zones/${payload.zone_id}`).then(z=>{zonesCache[z.id]=z;buildAvailList();updateStats();buildZoneGrid();}).catch(()=>{});
-        if(openZoneId===payload.zone_id)renderSala(zonesCache[openZoneId]);
-        if(modalSpaceId===payload.id)renderModal();
+  ws.onmessage = ({data}) => {
+    try {
+      const {event, payload} = JSON.parse(data);
+      if (event === 'space_updated') {
+        const prev = spacesCache[payload.id];
+        spacesCache[payload.id] = payload;
+        if (prev && prev.status !== payload.status) addLiveEvent(payload);
+        // Actualiza zona desde la API
+        apiFetch(`/zones/${payload.zone_id}`)
+          .then(z => { zonesCache[z.id] = z; updateStats(); buildZoneGrid(); })
+          .catch(() => {});
+        if (openZoneId === payload.zone_id) {
+          const z = zonesCache[openZoneId]; if (z) renderSala(z);
+        }
+        if (modalSpaceId === payload.id) renderModal();
       }
-    }catch(_){}
+    } catch(_) {}
   };
-  ws.onclose=()=>{setWsDot('off');setTimeout(connectWS,3000);};
-  ws.onerror=()=>setWsDot('err');
+  ws.onclose  = () => { setWsDot('off'); setTimeout(connectWS, 3000); };
+  ws.onerror  = () => setWsDot('err');
 }
 
-function setWsDot(state){
-  const dot=$$('ws-dot'),lbl=$$('ws-label'),badge=$$('ws-badge');
-  dot.className='ws-dot';
-  const m={on:['on','En vivo'],connecting:['','Conectando'],err:['err','Error'],off:['','Offline']};
-  const[cls,txt]=m[state]||['',''];
-  if(cls)dot.classList.add(cls);
-  lbl.textContent=txt;
-  if(badge)badge.style.opacity=state==='on'?'1':'.4';
+function setWsDot(state) {
+  const dot = $$('ws-dot'), lbl = $$('ws-label'), badge = $$('ws-badge');
+  dot.className = 'ws-dot';
+  const m = {on:['on','En vivo'],connecting:['','Conectando'],err:['err','Error'],off:['','Offline']};
+  const [cls, txt] = m[state] || ['',''];
+  if (cls) dot.classList.add(cls);
+  lbl.textContent = txt;
+  if (badge) badge.style.opacity = state === 'on' ? '1' : '.4';
 }
 
-/* ── STATS ── */
-function updateStats(){
-  const sp=Object.values(spacesCache);
-  const free=sp.filter(s=>s.status==='available').length;
-  const occ=sp.filter(s=>s.status==='occupied').length;
-  const cap=sp.reduce((a,s)=>a+s.capacity,0);
-  const occT=sp.reduce((a,s)=>a+s.occupancy,0);
-  $$('stat-free').textContent=free;
-  $$('stat-occ').textContent=occ;
-  $$('stat-total').textContent=sp.length;
-  $$('stat-pct').textContent=(cap?Math.round(occT/cap*100):0)+'%';
+/* ── Stats por sala ── */
+function updateStats() {
+  const SP1 = Object.values(zonesCache).find(z => z.code === 'SP1');
+  const SP2 = Object.values(zonesCache).find(z => z.code === 'SP2');
+
+  function fillRow(zone, prefix) {
+    if (!zone) return;
+    const spaces = Object.values(spacesCache).filter(s => s.zone_id === zone.id);
+    const isLocked = spaces.length > 0 && spaces.every(s => s.status === 'maintenance');
+    const free  = spaces.filter(s => s.status === 'available').length;
+    const occ   = spaces.filter(s => s.status === 'occupied' || s.status === 'partial').length;
+    const total = spaces.length;
+    const cap   = spaces.reduce((a,s) => a + s.capacity, 0);
+    const occT  = spaces.reduce((a,s) => a + s.occupancy, 0);
+    const pct   = cap ? Math.round(occT / cap * 100) : 0;
+
+    const set = (id, val) => { const el = $$(id); if (el) el.textContent = val; };
+    set(prefix+'-free',  free);
+    set(prefix+'-occ',   occ);
+    set(prefix+'-total', total);
+    set(prefix+'-pct',   pct + '%');
+
+    // Chip de estado
+    const chip = $$(prefix+'-chip');
+    if (chip) {
+      if (prefix === 's1') {
+        // Sala 1 always open
+        chip.className   = 'sala-lock-chip unlocked';
+        chip.textContent = '🟢 Abierta';
+      } else {
+        // Sala 2
+        if (isLocked) {
+          chip.className   = 'sala-lock-chip locked';
+          chip.textContent = '🔒 Cerrada';
+          // Dim the stats items
+          document.querySelectorAll('#s2-row .stat-item').forEach(el => el.classList.add('faded'));
+        } else {
+          chip.className   = 'sala-lock-chip unlocked';
+          chip.textContent = '🔓 Abierta';
+          document.querySelectorAll('#s2-row .stat-item').forEach(el => el.classList.remove('faded'));
+        }
+      }
+    }
+  }
+
+  fillRow(SP1, 's1');
+  fillRow(SP2, 's2');
 }
 
-function zoneSt(z){
-  if(!z.total_spaces||z.available===z.total_spaces)return'libre';
-  if(z.available===0)return'ocupado';
-  return'parcial';
+/* ── Helpers zona ── */
+function zoneSt(z) {
+  if (!z.total_spaces || z.available === z.total_spaces) return 'libre';
+  if (z.available === 0) return 'ocupado';
+  return 'parcial';
 }
-const ST_LABEL={libre:'Libre',parcial:'Parcial',ocupado:'Ocupado'};
+const ST_LABEL = {libre:'Libre', parcial:'Parcial', ocupado:'Ocupado'};
 
-/* ── ZONE GRID ── */
-function buildZoneGrid(){
-  const grid=$$('zone-grid');grid.innerHTML='';
-  const zones=Object.values(zonesCache);
-  if(!zones.length){grid.innerHTML='<div style="padding:32px;text-align:center;color:var(--text-3);font-size:12px;">Sin datos de zonas</div>';return;}
-
-  // Solo ZA para la demo
-  const z=zones[0];
-  const st=zoneSt(z),pct=Math.round(z.occupancy_pct);
-
-  const card=document.createElement('div');
-  card.className='zone-card';
-  card.style.maxWidth='420px';card.style.margin='0 auto';
-  card.innerHTML=`
-    <div class="zone-card-head">
-      <div class="zone-card-icon">👩‍🏫</div>
-      <div class="zone-card-name">${z.name}</div>
-      <div class="zone-card-badge ${st}">${ST_LABEL[st]}</div>
-    </div>
-    <div class="zone-card-body">
-      <div class="zone-card-meta">${z.occupied} ocupados · ${z.available} libres · ${pct}% ocupación</div>
-      <div class="zone-bar"><div class="zone-bar-fill ${st}" style="width:${pct}%"></div></div>
-    </div>
-    <div class="zone-card-arrow">Ver sala →</div>`;
-  card.onclick=()=>openSala(z.id);
-  grid.appendChild(card);
+function zoneIsLocked(zoneId) {
+  const spaces = Object.values(spacesCache).filter(s => s.zone_id === zoneId);
+  return spaces.length > 0 && spaces.every(s => s.status === 'maintenance');
 }
 
-/* ── AVAIL LIST ── */
-function buildAvailList(){
-  const c=$$('avail-list');c.innerHTML='';
-  Object.values(zonesCache).forEach(z=>{
-    const st=zoneSt(z),pct=Math.round(z.occupancy_pct);
-    const item=document.createElement('div');
-    item.className=`avail-item ${st}`;
-    item.innerHTML=`
-      <div style="flex:1">
-        <div class="avail-item-name">${z.code} — ${z.name}</div>
-        <div class="avail-item-meta">${z.occupied} ocup · ${z.available} libre · ${pct}%</div>
+/* ── Zone grid: 2 salas lado a lado ── */
+function buildZoneGrid() {
+  const grid = $$('zone-grid'); grid.innerHTML = '';
+  const zones = Object.values(zonesCache).sort((a,b) => a.code.localeCompare(b.code));
+  if (!zones.length) { grid.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-3);font-size:12px;">Sin datos</div>'; return; }
+
+  // SP1 occupancy para mostrar progress de desbloqueo en SP2
+  const sp1 = zones.find(z => z.code === 'SP1');
+  const sp1Spaces = sp1 ? Object.values(spacesCache).filter(s => s.zone_id === sp1.id) : [];
+  const sp1OccPct = sp1Spaces.length
+    ? Math.round(sp1Spaces.filter(s => s.status === 'occupied' || s.status === 'partial').length / sp1Spaces.length * 100)
+    : 0;
+
+  const row = document.createElement('div');
+  row.className = 'zone-cards-row';
+
+  zones.forEach(z => {
+    const locked = zoneIsLocked(z.id);
+    const st     = locked ? 'cerrado' : zoneSt(z);
+    const pct    = Math.round(z.occupancy_pct);
+
+    const card = document.createElement('div');
+    card.className = locked ? 'zone-card locked-card' : 'zone-card clickable';
+
+    let bodyHtml = '';
+    if (locked) {
+      bodyHtml = `
+        <div class="zone-card-meta muted">Sala disponible cuando SP1 alcance el 75% de ocupación</div>
+        <div class="zone-unlock-hint">📊 Ocupación SP1 actual: <strong>&nbsp;${sp1OccPct}%</strong> / 75%</div>
+        <div class="zone-unlock-bar"><div class="zone-unlock-fill" style="width:${Math.min(sp1OccPct,100)}%"></div></div>`;
+    } else {
+      bodyHtml = `
+        <div class="zone-card-meta">${z.occupied} ocupados · ${z.available} libres · ${pct}% ocupación</div>
+        <div class="zone-bar"><div class="zone-bar-fill ${st}" style="width:${pct}%"></div></div>`;
+    }
+
+    card.innerHTML = `
+      <div class="zone-card-head">
+        <div class="zone-card-icon">👩‍🏫</div>
+        <div class="zone-card-name">${z.name}</div>
+        <div class="zone-card-badge ${st}">${locked ? '🔒 Cerrada' : ST_LABEL[st]}</div>
       </div>
-      <div class="avail-item-badge ${st}">${ST_LABEL[st]}</div>`;
-    item.onclick=()=>openSala(z.id);
-    c.appendChild(item);
+      <div class="zone-card-body">${bodyHtml}</div>
+      <div class="zone-card-footer">${locked ? '— Sala cerrada —' : 'Ver puestos →'}</div>`;
+
+    if (!locked) card.onclick = () => openSala(z.id);
+    row.appendChild(card);
   });
+
+  grid.appendChild(row);
 }
 
-/* ── LIVE FEED ── */
-function addLiveEvent(space){
-  const now=new Date();
-  const timeStr=now.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
-  const action={available:'liberó',occupied:'ocupó',partial:'entró en',reserved:'reservó'}[space.status]||'cambió';
-  liveEvents.unshift({code:space.code,label:space.label,action,time:timeStr});
-  if(liveEvents.length>6)liveEvents.pop();
+/* ── Live feed ── */
+function addLiveEvent(space) {
+  const now     = new Date();
+  const timeStr = now.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
+  const action  = {available:'liberó', occupied:'ocupó', partial:'entró en', maintenance:'bloqueó'}[space.status] || 'actualizó';
+  const zone    = zonesCache[space.zone_id];
+  const salaCode = zone ? zone.code : '';
+  liveEvents.unshift({code:space.code, label:space.label, action, time:timeStr, salaCode});
+  if (liveEvents.length > 8) liveEvents.pop();
   renderLiveFeed();
 }
 
-function renderLiveFeed(){
-  const c=$$('live-feed');
-  if(!liveEvents.length){
-    c.innerHTML='<div class="live-empty">Sin actividad reciente</div>';return;
+function renderLiveFeed() {
+  const c = $$('live-feed');
+  if (!liveEvents.length) {
+    c.innerHTML = '<div class="live-empty">Sin actividad reciente</div>'; return;
   }
-  c.innerHTML=liveEvents.map(e=>`
+  c.innerHTML = liveEvents.map(e => {
+    const isSP2 = e.salaCode === 'SP2';
+    return `
     <div class="live-item">
-      <div class="live-avatar">${e.code[0]}</div>
+      <div class="live-avatar ${isSP2?'sp2':''}">${e.code[0]}</div>
       <div>
         <div class="live-text">Puesto <strong>${e.code}</strong> ${e.action}</div>
-        <div class="live-time">${e.time}</div>
+        <div class="live-time">${e.salaCode ? e.salaCode+' · ' : ''}${e.time}</div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
-/* ── SALA ── */
-function openSala(zoneId){
-  const z=zonesCache[zoneId];if(!z)return;
-  openZoneId=zoneId;
+/* ── Sala view ── */
+function openSala(zoneId) {
+  if (zoneIsLocked(zoneId)) return;
+  const z = zonesCache[zoneId]; if (!z) return;
+  openZoneId = zoneId;
   $$('zone-grid').classList.add('hide');
   $$('sala-view').classList.add('show');
   renderSala(z);
 }
 
-function closeSala(){
-  openZoneId=null;
+function closeSala() {
+  openZoneId = null;
   $$('zone-grid').classList.remove('hide');
   $$('sala-view').classList.remove('show');
-  $$('sala-canvas').innerHTML='';
+  $$('sala-canvas').innerHTML = '';
 }
 
-function renderSala(z){
-  const st=zoneSt(z);
-  $$('sala-title').textContent=`${z.code} — ${z.name}`;
-  $$('sala-badge').textContent=ST_LABEL[st];
-  $$('sala-badge').className=`sala-nav-badge ${st}`;
+function renderSala(z) {
+  const st = zoneSt(z);
+  $$('sala-title').textContent    = `${z.code} — ${z.name}`;
+  $$('sala-badge').textContent    = ST_LABEL[st] || 'Libre';
+  $$('sala-badge').className      = `sala-nav-badge ${st}`;
 
-  const spaces=Object.values(spacesCache).filter(s=>s.zone_id===z.id);
-  const libre=spaces.filter(s=>s.status==='available').length;
-  const ocup=spaces.filter(s=>s.status!=='available').length;
+  const spaces = Object.values(spacesCache).filter(s => s.zone_id === z.id);
+  const libre  = spaces.filter(s => s.status === 'available').length;
+  const ocup   = spaces.filter(s => s.status !== 'available').length;
 
-  const canvas=$$('sala-canvas');canvas.innerHTML='';
+  const canvas = $$('sala-canvas'); canvas.innerHTML = '';
 
-  // Mini stats
-  const statsEl=document.createElement('div');statsEl.className='sala-stats-mini';
-  statsEl.innerHTML=`
-    <div class="sala-stat">
-      <div><div class="sala-stat-val g">${libre}</div><div class="sala-stat-lbl">Libres</div></div>
-    </div>
-    <div class="sala-stat">
-      <div><div class="sala-stat-val r">${ocup}</div><div class="sala-stat-lbl">Ocupados</div></div>
-    </div>
-    <div class="sala-stat">
-      <div><div class="sala-stat-val" style="color:var(--text)">${spaces.length}</div><div class="sala-stat-lbl">Total</div></div>
+  // Mini stats + consumo
+  const statsEl = document.createElement('div');
+  statsEl.className = 'sala-stats-mini';
+  statsEl.innerHTML = `
+    <div class="sala-stat"><div><div class="sala-stat-val g">${libre}</div><div class="sala-stat-lbl">Libres</div></div></div>
+    <div class="sala-stat"><div><div class="sala-stat-val r">${ocup}</div><div class="sala-stat-lbl">Ocupados</div></div></div>
+    <div class="sala-stat"><div><div class="sala-stat-val" style="color:var(--text)">${spaces.length}</div><div class="sala-stat-lbl">Puestos</div></div></div>
+    <div class="sala-consumption-bar" style="flex:1">
+      ⚡&nbsp;<strong>240 W/puesto</strong> &nbsp;+&nbsp; <strong>1 820 W sala</strong> (AC + ilum.)
+      &nbsp;·&nbsp; ${ocup > 0 ? `~${(ocup * 0.24 + 1.82).toFixed(2)} kW ahora` : 'sala vacía · solo costes fijos si luz/AC encendidos'}
     </div>`;
   canvas.appendChild(statsEl);
 
   // Plano
-  const oficina=document.createElement('div');oficina.className='oficina';
-  const wallTop=document.createElement('div');wallTop.className='oficina-wall-top';
+  const oficina = document.createElement('div'); oficina.className = 'oficina';
+  const wallTop = document.createElement('div'); wallTop.className = 'oficina-wall-top';
   oficina.appendChild(wallTop);
+  const body = document.createElement('div'); body.className = 'oficina-body';
 
-  const body=document.createElement('div');body.className='oficina-body';
-
-  // Pizarra
-  const piz=document.createElement('div');piz.className='pizarra';
-  piz.innerHTML='<span class="pizarra-txt">Pizarra / Pantalla</span>';
+  const piz = document.createElement('div'); piz.className = 'pizarra';
+  piz.innerHTML = '<span class="pizarra-txt">Pizarra / Pantalla</span>';
   body.appendChild(piz);
 
-  // Distribuir en dos filas
-  const mitad=Math.ceil(spaces.length/2);
-  const filaA=spaces.slice(0,mitad);
-  const filaB=spaces.slice(mitad);
+  const mitad = Math.ceil(spaces.length / 2);
+  body.appendChild(buildFila(spaces.slice(0, mitad), 'Fila A — Zona delantera'));
 
-  body.appendChild(buildFila(filaA,'Fila A — Zona delantera'));
-
-  const pas=document.createElement('div');pas.className='pasillo';
-  pas.innerHTML='<div class="pasillo-line"></div><span class="pasillo-label">Pasillo central</span><div class="pasillo-line"></div>';
+  const pas = document.createElement('div'); pas.className = 'pasillo';
+  pas.innerHTML = '<div class="pasillo-line"></div><span class="pasillo-label">Pasillo central</span><div class="pasillo-line"></div>';
   body.appendChild(pas);
-
-  body.appendChild(buildFila(filaB,'Fila B — Zona trasera'));
+  body.appendChild(buildFila(spaces.slice(mitad), 'Fila B — Zona trasera'));
 
   oficina.appendChild(body);
   canvas.appendChild(oficina);
 }
 
-function buildFila(spaces,label){
-  const wrap=document.createElement('div');
-  const lbl=document.createElement('div');lbl.className='fila-label';lbl.textContent=label;
+function buildFila(spaces, label) {
+  const wrap = document.createElement('div');
+  const lbl  = document.createElement('div'); lbl.className = 'fila-label'; lbl.textContent = label;
   wrap.appendChild(lbl);
-  const fila=document.createElement('div');fila.className='fila';
-  spaces.forEach(sp=>{
-    const cls=sp.status==='available'?'libre':sp.status==='reserved'?'reservado':'ocupado';
-    const stLabel={available:'Libre',occupied:'Ocupado',partial:'Parcial',reserved:'Reservado',maintenance:'Mantenimiento'}[sp.status]||sp.status;
-    const p=document.createElement('div');p.className=`puesto ${cls}`;
-    p.innerHTML=`<div class="puesto-mesa"><div class="puesto-screen"></div><div class="puesto-status-dot"></div></div><div class="puesto-chair"></div><div class="puesto-code">${sp.code}</div>`;
-    p.addEventListener('mouseenter',e=>{
-      const tt=$$('tooltip');
-      $$('tt-name').textContent=sp.label;
-      $$('tt-st').textContent=stLabel;
-      $$('tt-occ').textContent=`${sp.occupancy}/${sp.capacity}`;
-      tt.style.left=(e.clientX+14)+'px';tt.style.top=(e.clientY-10)+'px';
+  const fila = document.createElement('div'); fila.className = 'fila';
+  spaces.forEach(sp => {
+    const cls = sp.status === 'available' ? 'libre' : 'ocupado';
+    const stLabel = {available:'Libre',occupied:'Ocupado',partial:'Parcial',maintenance:'Cerrado'}[sp.status] || sp.status;
+    const p = document.createElement('div'); p.className = `puesto ${cls}`;
+    p.innerHTML = `<div class="puesto-mesa"><div class="puesto-screen"></div><div class="puesto-status-dot"></div></div><div class="puesto-chair"></div><div class="puesto-code">${sp.code}</div>`;
+    p.addEventListener('mouseenter', e => {
+      const tt = $$('tooltip');
+      $$('tt-name').textContent = sp.label;
+      $$('tt-st').textContent   = stLabel;
+      $$('tt-occ').textContent  = `${sp.occupancy}/${sp.capacity}`;
+      tt.style.left = (e.clientX + 14) + 'px';
+      tt.style.top  = (e.clientY - 10) + 'px';
       tt.classList.add('show');
     });
-    p.addEventListener('mousemove',e=>{
-      const tt=$$('tooltip');
-      tt.style.left=(e.clientX+14)+'px';tt.style.top=(e.clientY-10)+'px';
+    p.addEventListener('mousemove', e => {
+      const tt = $$('tooltip');
+      tt.style.left = (e.clientX + 14) + 'px';
+      tt.style.top  = (e.clientY - 10) + 'px';
     });
-    p.addEventListener('mouseleave',()=>$$('tooltip').classList.remove('show'));
-    p.addEventListener('click',()=>openModal(sp.id));
+    p.addEventListener('mouseleave', () => $$('tooltip').classList.remove('show'));
+    p.addEventListener('click', () => openModal(sp.id));
     fila.appendChild(p);
   });
   wrap.appendChild(fila);
   return wrap;
 }
 
-/* ── MODAL ── */
-const ST_MAP={available:'libre',occupied:'ocupado',partial:'parcial',reserved:'reservado',maintenance:'libre'};
-const ST_LABELS={available:'Disponible',occupied:'Ocupado',partial:'Parcial',reserved:'Reservado',maintenance:'Mantenimiento'};
+/* ── Modal ── */
+const ST_MAP    = {available:'libre', occupied:'ocupado', partial:'parcial', maintenance:'cerrado'};
+const ST_LABELS = {available:'Disponible', occupied:'Ocupado', partial:'Parcial', maintenance:'Sala cerrada'};
 
-function openModal(spaceId){
-  modalSpaceId=spaceId;renderModal();
+function openModal(spaceId) {
+  modalSpaceId = spaceId;
+  renderModal();
   $$('modal-backdrop').classList.add('active');
 }
 
-function closeModal(){
+function closeModal() {
   $$('modal-backdrop').classList.remove('active');
-  clearInterval(modalTimerIv);modalTimerIv=null;modalSpaceId=null;
-  $$('modal-feedback').textContent='';$$('modal-feedback').className='modal-feedback';
-  $$('modal-timer').textContent='';
+  modalSpaceId = null;
+  $$('modal-feedback').textContent = '';
+  $$('modal-feedback').className   = 'modal-feedback';
 }
 
-function renderModal(){
-  const s=spacesCache[modalSpaceId];if(!s)return;
-  const zone=zonesCache[s.zone_id];
-  $$('modal-title').textContent=s.label;
-  $$('modal-subtitle').textContent=zone?`${zone.code} — ${zone.name}`:'—';
-  $$('modal-zone').textContent=zone?zone.code:'—';
-  $$('modal-cap').textContent=`${s.capacity} personas`;
-  $$('modal-st-occ').textContent=`${s.occupancy}/${s.capacity}`;
-  $$('modal-st-label').textContent=ST_LABELS[s.status]||s.status;
-  $$('modal-status').className=`modal-status ${ST_MAP[s.status]||'libre'}`;
-  const myId=currentUser?.id;
-  const isMyR=s.status==='reserved'&&s.reservation_user_id===myId;
-  $$('btn-reserve').style.display=s.status==='available'?'':'none';
-  $$('btn-confirm').style.display=isMyR?'':'none';
-  $$('btn-checkin').style.display=(s.status==='available'||isMyR)?'':'none';
-  $$('btn-checkout').style.display=(s.status==='occupied'||s.status==='partial')?'':'none';
-  clearInterval(modalTimerIv);$$('modal-timer').textContent='';
-  if(s.status==='reserved'&&s.reservation_expires_at){
-    tickTimer(s.reservation_expires_at);
-    modalTimerIv=setInterval(()=>tickTimer(s.reservation_expires_at),1000);
+function renderModal() {
+  const s = spacesCache[modalSpaceId]; if (!s) return;
+  const zone = zonesCache[s.zone_id];
+  $$('modal-title').textContent    = s.label;
+  $$('modal-subtitle').textContent = zone ? `${zone.code} — ${zone.name}` : '—';
+  $$('modal-zone').textContent     = zone ? zone.code : '—';
+  $$('modal-cap').textContent      = `${s.capacity} persona`;
+  $$('modal-st-occ').textContent   = `${s.occupancy}/${s.capacity}`;
+  $$('modal-st-label').textContent = ST_LABELS[s.status] || s.status;
+  $$('modal-status').className     = `modal-status ${ST_MAP[s.status] || 'libre'}`;
+
+  const isMaintenance = s.status === 'maintenance';
+  const isOccupied    = s.status === 'occupied' || s.status === 'partial';
+  const isAvailable   = s.status === 'available';
+
+  $$('btn-checkin').style.display  = isAvailable  ? '' : 'none';
+  $$('btn-checkout').style.display = isOccupied   ? '' : 'none';
+  $$('btn-checkin').disabled       = false;
+  $$('btn-checkout').disabled      = false;
+
+  if (isMaintenance) {
+    setFeedback('🔒 Esta sala está cerrada', 'err');
+  } else {
+    $$('modal-feedback').textContent = '';
+    $$('modal-feedback').className   = 'modal-feedback';
   }
 }
 
-function tickTimer(exp){
-  const rem=Math.max(0,Math.floor((new Date(exp)-Date.now())/1000));
-  $$('modal-timer').textContent=rem>0?`⏱ Expira en ${pad(Math.floor(rem/60))}:${pad(rem%60)}`:'Reserva expirada';
-  if(rem===0)clearInterval(modalTimerIv);
+function setFeedback(msg, type = 'ok') {
+  const el = $$('modal-feedback');
+  el.textContent = msg;
+  el.className   = `modal-feedback ${type}`;
 }
 
-function setFeedback(msg,type='ok'){
-  const el=$$('modal-feedback');el.textContent=msg;el.className=`modal-feedback ${type}`;
+async function doCheckin() {
+  try {
+    $$('btn-checkin').disabled = true;
+    await apiFetch(`/spaces/${modalSpaceId}/checkin`, {method:'POST'});
+    setFeedback('▶ Sesión iniciada — el tiempo corre desde ahora', 'ok');
+    spacesCache[modalSpaceId] = await apiFetch(`/spaces/${modalSpaceId}`);
+    renderModal();
+    if (openZoneId) renderSala(zonesCache[openZoneId]);
+  } catch(e) {
+    setFeedback(e.message, 'err');
+    $$('btn-checkin').disabled = false;
+  }
 }
 
-async function doReserve(){
-  try{
-    $$('btn-reserve').disabled=true;
-    const d=await apiFetch(`/spaces/${modalSpaceId}/reserve`,{method:'POST'});
-    spacesCache[modalSpaceId]={...spacesCache[modalSpaceId],status:'reserved',reservation_user_id:currentUser.id,reservation_expires_at:d.expires_at};
-    setFeedback('Reserva activa — confirma antes de que expire','ok');renderModal();
-    if(openZoneId)renderSala(zonesCache[openZoneId]);
-  }catch(e){setFeedback(e.message,'err');$$('btn-reserve').disabled=false;}
-}
-async function doConfirm(){
-  try{
-    $$('btn-confirm').disabled=true;
-    await apiFetch(`/spaces/${modalSpaceId}/confirm`,{method:'POST'});
-    setFeedback('✓ Check-in confirmado','ok');
-    spacesCache[modalSpaceId]=await apiFetch(`/spaces/${modalSpaceId}`);
-    renderModal();if(openZoneId)renderSala(zonesCache[openZoneId]);
-  }catch(e){setFeedback(e.message,'err');$$('btn-confirm').disabled=false;}
-}
-async function doCheckin(){
-  try{
-    $$('btn-checkin').disabled=true;
-    await apiFetch(`/spaces/${modalSpaceId}/checkin`,{method:'POST'});
-    setFeedback('✓ Entrada registrada','ok');
-    spacesCache[modalSpaceId]=await apiFetch(`/spaces/${modalSpaceId}`);
-    renderModal();if(openZoneId)renderSala(zonesCache[openZoneId]);
-  }catch(e){setFeedback(e.message,'err');$$('btn-checkin').disabled=false;}
-}
-async function doCheckout(){
-  try{
-    $$('btn-checkout').disabled=true;
-    await apiFetch(`/spaces/${modalSpaceId}/checkout`,{method:'POST'});
-    setFeedback('✓ Salida registrada','ok');
-    spacesCache[modalSpaceId]=await apiFetch(`/spaces/${modalSpaceId}`);
-    renderModal();if(openZoneId)renderSala(zonesCache[openZoneId]);
-  }catch(e){setFeedback(e.message,'err');$$('btn-checkout').disabled=false;}
+async function doCheckout() {
+  try {
+    $$('btn-checkout').disabled = true;
+    await apiFetch(`/spaces/${modalSpaceId}/checkout`, {method:'POST'});
+    setFeedback('■ Sesión cerrada — consumo registrado', 'ok');
+    spacesCache[modalSpaceId] = await apiFetch(`/spaces/${modalSpaceId}`);
+    renderModal();
+    if (openZoneId) renderSala(zonesCache[openZoneId]);
+  } catch(e) {
+    setFeedback(e.message, 'err');
+    $$('btn-checkout').disabled = false;
+  }
 }
 
-
-
-/* ── INIT ── */
+/* ── Init ── */
 startPolling();
 renderLiveFeed();
 </script>
