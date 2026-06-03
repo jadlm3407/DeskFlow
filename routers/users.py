@@ -49,7 +49,6 @@ def get_user(
     current: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    # Un usuario sólo puede ver su propio perfil; admin puede ver cualquiera
     if current.role != models.RoleEnum.admin and current.id != user_id:
         raise HTTPException(403, "Sin permisos")
     user = db.get(models.User, user_id)
@@ -71,7 +70,6 @@ def update_user(
     if not user:
         raise HTTPException(404, "Usuario no encontrado")
 
-    # No-admin no puede cambiar su propio rol ni desactivarse
     for field, value in body.model_dump(exclude_unset=True).items():
         if field in ("role", "is_active") and current.role != models.RoleEnum.admin:
             raise HTTPException(403, f"No puedes cambiar '{field}'")
@@ -87,6 +85,20 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     user = db.get(models.User, user_id)
     if not user:
         raise HTTPException(404, "Usuario no encontrado")
+
+    # Borrar dependencias manualmente antes de borrar el usuario
+    # (User no tiene cascade en occupancies ni nfc_cards)
+    db.query(models.NfcCard).filter(models.NfcCard.user_id == user_id).delete()
+    db.query(models.Occupancy).filter(models.Occupancy.user_id == user_id).delete()
+
+    # Limpiar reservas activas que tenga el usuario en espacios
+    spaces_con_reserva = db.query(models.Space).filter(
+        models.Space.reservation_user_id == user_id
+    ).all()
+    for space in spaces_con_reserva:
+        space.reservation_user_id = None
+        space.reservation_expires_at = None
+
     db.delete(user)
     db.commit()
     return {"detail": f"Usuario {user.dni} eliminado"}

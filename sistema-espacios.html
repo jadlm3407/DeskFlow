@@ -517,7 +517,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
                 </div>
                 <div class="form-row" style="margin-bottom:16px;">
                   <label class="form-label">Destinatario</label>
-                  <input class="form-input" id="report-email" value="peihaosun2007@gmail.com" readonly style="color:var(--text-3);">
+                  <input class="form-input" id="report-email" value="peihaosun2007@gmail.com" placeholder="destinatario@email.com">
                 </div>
                 <button class="btn-send-report" id="btn-send-report" onclick="enviarInforme()">📧 Enviar informe ahora</button>
                 <div class="form-msg" id="report-msg"></div>
@@ -656,7 +656,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 </div>
 
 <script>
-const API='http://192.168.1.15:8000', WS_URL='ws://192.168.1.15:8000/ws';
+const API='http://localhost:8000', WS_URL='ws://localhost:8000/ws';
 let token=null,currentUser=null,sessionStart=null,sessionIv=null,ws=null,pollingIv=null;
 let spacesCache={},zonesCache={},modalSpaceId=null,openZoneId=null,liveEvents=[];
 let currentView='salas', reportPeriod='week';
@@ -698,23 +698,42 @@ async function showApp(){
   sessionIv=setInterval(updateSession,1000);
   await loadData();
   connectWS();
-  if(u.role==='admin'){ loadUsers(); loadHistorial(); loadUsersForNfc(); }
+  // No cargar historial aquí — se carga al abrir el panel admin
+  if(u.role==='admin'){ loadUsers(); loadUsersForNfc(); }
 }
 
 async function doLogout(){
   try{await apiFetch('/auth/logout',{method:'POST'});}catch(_){}
   clearInterval(sessionIv);
-  if(ws){ws.close();ws=null;}
-  token=null;currentUser=null;spacesCache={};zonesCache={};openZoneId=null;liveEvents=[];
+  // Detener WS sin que dispare el reconectado automático
+  if(ws){ws.onclose=null;ws.onerror=null;ws.close();ws=null;}
+  token=null;currentUser=null;spacesCache={};zonesCache={};
+  openZoneId=null;modalSpaceId=null;liveEvents=[];
+  currentView='salas';
   setWsDot('off');
+  // Limpiar nav admin
+  const navAdmin=$$('nav-admin');
+  if(navAdmin){const parent=navAdmin.closest('div');if(parent)parent.remove();}
+  // Resetear todas las vistas
+  $$('admin-panel').classList.remove('show');
+  $$('zone-grid').classList.remove('hide');
+  $$('sala-view').classList.remove('show');
+  $$('sala-canvas').innerHTML='';
+  $$('modal-backdrop').classList.remove('active');
+  $$('legend-salas').style.display='';
+  $$('tb-section').textContent='Salas de Profesores';
+  $$('canvas-title').textContent='Salas de Profesores';
+  $$('canvas-sub').textContent='Selecciona una sala para ver los despachos';
+  document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+  $$('nav-salas').classList.add('active');
+  // Limpiar live feed
+  $$('live-feed').innerHTML='<div class="live-empty">Sin actividad reciente</div>';
+  // Volver al kiosko
   $$('view-app').classList.remove('active');
   $$('view-kiosko').classList.add('active');
   $$('kiosko-wait').classList.remove('hide');
   $$('kiosko-detected').classList.remove('show');
   $$('scan-bar').style.width='0%';
-  // Limpiar nav admin
-  const adminSec=$$('sidebar-nav').querySelector('[id="nav-admin"]');
-  if(adminSec) adminSec.closest('div').remove();
   startPolling();
 }
 
@@ -741,6 +760,10 @@ async function loadData(){
 /* ── View switching ── */
 function switchView(v){
   currentView=v;
+  // Cerrar sala detalle y resetear openZoneId siempre
+  openZoneId=null;
+  $$('sala-view').classList.remove('show');
+  $$('sala-canvas').innerHTML='';
   // Nav
   document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
   const navEl=v==='salas'?$$('nav-salas'):$$('nav-admin');
@@ -752,17 +775,26 @@ function switchView(v){
   // Legend
   $$('legend-salas').style.display=v==='salas'?'':'none';
   // Panels
-  $$('zone-grid').style.display=v==='salas'?'':'none';
-  $$('sala-view').classList.remove('show');
-  $$('admin-panel').classList.toggle('show',v==='admin');
-  if(v==='admin'){loadUsers();loadHistorial();loadUsersForNfc();}
+  if(v==='salas'){
+    $$('zone-grid').classList.remove('hide');
+    $$('admin-panel').classList.remove('show');
+  } else {
+    $$('zone-grid').classList.add('hide');
+    $$('admin-panel').classList.add('show');
+    // Solo cargar datos admin si spacesCache ya está listo
+    if(Object.keys(spacesCache).length>0){
+      loadUsers();loadHistorial();loadUsersForNfc();
+    } else {
+      loadData().then(()=>{loadUsers();loadHistorial();loadUsersForNfc();});
+    }
+  }
 }
 
 /* WebSocket */
 function connectWS(){
   if(ws)ws.close();setWsDot('connecting');
   ws=new WebSocket(`${WS_URL}?room=all`);
-  ws.onopen=()=>{setWsDot('on');setInterval(()=>{if(ws&&ws.readyState===1)ws.send('ping');},25000);};
+  ws.onopen=()=>{setWsDot('on');setInterval(()=>{ if(ws&&ws.readyState===1)ws.send('ping'); },25000);};
   ws.onmessage=({data})=>{
     try{
       const {event,payload}=JSON.parse(data);
@@ -773,10 +805,12 @@ function connectWS(){
         apiFetch(`/zones/${payload.zone_id}`).then(z=>{zonesCache[z.id]=z;buildZoneGrid();}).catch(()=>{});
         if(openZoneId===payload.zone_id){const z=zonesCache[openZoneId];if(z)renderSala(z);}
         if(modalSpaceId===payload.id)renderModal();
+        // Refrescar historial si el panel admin está abierto
+        if(currentView==='admin'&&$$('admin-panel').classList.contains('show')) loadHistorial();
       }
     }catch(_){}
   };
-  ws.onclose=()=>{setWsDot('off');setTimeout(connectWS,3000);};
+  ws.onclose=()=>{ setWsDot('off'); if(token) setTimeout(connectWS,3000); };
   ws.onerror=()=>setWsDot('err');
 }
 function setWsDot(state){
@@ -796,7 +830,7 @@ function zoneIsLocked(zoneId){const s=Object.values(spacesCache).filter(s=>s.zon
 
 function buildZoneGrid(){
   const grid=$$('zone-grid');grid.innerHTML='';
-  const zones=Object.values(zonesCache).filter(z=>z.code==='SP1'||z.code==='SP2').sort((a,b)=>a.code.localeCompare(b.code));
+  const zones=Object.values(zonesCache).sort((a,b)=>a.code.localeCompare(b.code));
   if(!zones.length){grid.innerHTML='<div style="padding:32px;text-align:center;color:var(--text-3);font-size:12px;">Sin datos</div>';return;}
   const sp1=zones.find(z=>z.code==='SP1');
   const sp1S=sp1?Object.values(spacesCache).filter(s=>s.zone_id===sp1.id):[];
@@ -971,8 +1005,9 @@ function selectPeriod(p,btn){
 }
 async function enviarInforme(){
   const btn=$$('btn-send-report');btn.disabled=true;btn.textContent='Enviando…';
+  const emailDestino=$$('report-email').value.trim()||null;
   try{
-    await apiFetch('/energy/report',{method:'POST',body:JSON.stringify({period:reportPeriod})});
+    await apiFetch('/energy/report',{method:'POST',body:JSON.stringify({period:reportPeriod,email_destino:emailDestino})});
     showFormMsg('report-msg','✓ Informe enviado correctamente','ok');
   }catch(e){showFormMsg('report-msg',e.message,'err');}
   finally{btn.disabled=false;btn.textContent='📧 Enviar informe ahora';}
@@ -998,9 +1033,12 @@ async function registrarNfc(){
 
 /* Historial */
 async function loadHistorial(){
+  const spaces=Object.values(spacesCache);
+  if(!spaces.length){
+    $$('hist-tbody').innerHTML='<tr><td colspan="4" class="hist-empty">Sin datos de espacios</td></tr>';
+    return;
+  }
   try{
-    const spaces=Object.values(spacesCache);
-    if(!spaces.length)return;
     const allHist=[];
     for(const sp of spaces.slice(0,10)){
       try{
