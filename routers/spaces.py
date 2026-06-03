@@ -1,26 +1,29 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+import asyncio
 
-from database import get_db
+from database import get_db, SessionLocal
 from auth import get_current_user, require_admin, require_profesor_or_admin
 from websocket_manager import manager
 import models, schemas
 
 router = APIRouter(prefix="/spaces", tags=["spaces"])
 
-# ── Configuración de desbloqueo automático ────────────────────────────────────
-SALA1_CODE        = "SP1"
-SALA2_CODE        = "SP2"
-UNLOCK_THRESHOLD  = 0.75   # SP2 se abre cuando SP1 ≥ 75 % ocupado
-SPACE_WATTS       = 240    # W por puesto (PC 200 + Monitor 30 + Lámpara 10)
+# ── Configuración ─────────────────────────────────────────────────────────────
+SALA1_CODE            = "SP1"
+SALA2_CODE            = "SP2"
+SALAS_PROFE_CODES     = {"SP1", "SP2"}   # zonas de puestos de profesor
+UNLOCK_THRESHOLD      = 0.75
+RESERVATION_TTL       = 300              # 5 min para salas de reuniones
+
+_expiry_tasks: dict[int, asyncio.Task] = {}
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def _compute_status(space: models.Space) -> models.StatusEnum:
-    """Recalcula el estado de un espacio en función de occupancy/capacity."""
     if space.capacity == 0:
         return models.StatusEnum.available
     if space.occupancy == 0:
@@ -32,18 +35,36 @@ def _compute_status(space: models.Space) -> models.StatusEnum:
 
 
 async def _broadcast_space(space: models.Space):
-    """Emite un evento WebSocket con el estado actualizado del espacio."""
     payload = schemas.SpaceOut.model_validate(space).model_dump(mode="json")
     await manager.broadcast("space_updated", payload)
 
 
-async def _check_sala_unlock(db: Session):
-    """
-    Lógica de apertura/cierre automático de SP2 basada en la ocupación de SP1:
+def _is_profe_zone(zone_code: str) -> bool:
+    return zone_code in SALAS_PROFE_CODES
 
-    • SP1 ≥ 75 % ocupado  → desbloquea todos los puestos de SP2 (maintenance → available)
-    • SP1 <  75 % ocupado → re-bloquea SP2 SOLO si está completamente vacía
-    """
+
+def _user_has_active_profe_checkin(user_id: int, db: Session) -> bool:
+    """Devuelve True si el usuario ya tiene un puesto activo en SP1 o SP2."""
+    sp1 = db.query(models.Zone).filter_by(code=SALA1_CODE).first()
+    sp2 = db.query(models.Zone).filter_by(code=SALA2_CODE).first()
+    zone_ids = [z.id for z in [sp1, sp2] if z]
+    if not zone_ids:
+        return False
+    profe_space_ids = [
+        s.id for s in db.query(models.Space).filter(
+            models.Space.zone_id.in_(zone_ids)
+        ).all()
+    ]
+    if not profe_space_ids:
+        return False
+    return db.query(models.Occupancy).filter(
+        models.Occupancy.user_id == user_id,
+        models.Occupancy.space_id.in_(profe_space_ids),
+        models.Occupancy.active == True,
+    ).first() is not None
+
+
+async def _check_sala_unlock(db: Session):
     zona1 = db.query(models.Zone).filter_by(code=SALA1_CODE).first()
     zona2 = db.query(models.Zone).filter_by(code=SALA2_CODE).first()
     if not zona1 or not zona2:
@@ -64,13 +85,11 @@ async def _check_sala_unlock(db: Session):
 
     changed = False
     if pct1 >= UNLOCK_THRESHOLD:
-        # Desbloquear SP2
         for s in spaces2:
             if s.status == models.StatusEnum.maintenance:
                 s.status = models.StatusEnum.available
                 changed = True
     elif not sala2_active:
-        # Re-bloquear SP2 solo si está vacía
         for s in spaces2:
             if s.status == models.StatusEnum.available:
                 s.status = models.StatusEnum.maintenance
@@ -81,6 +100,33 @@ async def _check_sala_unlock(db: Session):
         for s in spaces2:
             db.refresh(s)
             await _broadcast_space(s)
+
+
+# ── Expiración de reservas ────────────────────────────────────────────────────
+
+def _cancel_expiry(space_id: int):
+    task = _expiry_tasks.pop(space_id, None)
+    if task:
+        task.cancel()
+
+
+async def _expire_reservation(space_id: int):
+    await asyncio.sleep(RESERVATION_TTL)
+    db = SessionLocal()
+    try:
+        space = db.get(models.Space, space_id)
+        if space and space.status == models.StatusEnum.reserved:
+            space.status                = models.StatusEnum.available
+            space.reservation_user_id   = None
+            space.reservation_expires_at = None
+            db.commit()
+            db.refresh(space)
+            payload = schemas.SpaceOut.model_validate(space).model_dump(mode="json")
+            await manager.broadcast("space_updated", payload)
+            await manager.broadcast("reservation_expired", {"space_id": space_id})
+    finally:
+        db.close()
+    _expiry_tasks.pop(space_id, None)
 
 
 # ── CRUD ──────────────────────────────────────────────────────────────────────
@@ -133,13 +179,10 @@ async def update_space(
     space = db.get(models.Space, space_id)
     if not space:
         raise HTTPException(404, "Espacio no encontrado")
-
     for field, value in body.model_dump(exclude_unset=True).items():
         setattr(space, field, value)
-
     if "occupancy" in body.model_dump(exclude_unset=True):
         space.status = _compute_status(space)
-
     db.commit()
     db.refresh(space)
     await _broadcast_space(space)
@@ -151,12 +194,74 @@ def delete_space(space_id: int, db: Session = Depends(get_db)):
     space = db.get(models.Space, space_id)
     if not space:
         raise HTTPException(404, "Espacio no encontrado")
+    _cancel_expiry(space_id)
     db.delete(space)
     db.commit()
     return {"detail": f"Espacio {space.code} eliminado"}
 
 
-# ── CHECK-IN / CHECK-OUT ──────────────────────────────────────────────────────
+# ── RESERVA (salas de reuniones) ──────────────────────────────────────────────
+
+@router.post("/{space_id}/reserve", response_model=schemas.ReservationOut)
+async def reserve(
+    space_id: int,
+    db: Session = Depends(get_db),
+    current: models.User = Depends(get_current_user),
+):
+    space = db.get(models.Space, space_id)
+    if not space:
+        raise HTTPException(404, "Espacio no encontrado")
+    if space.status == models.StatusEnum.maintenance:
+        raise HTTPException(409, "Sala cerrada")
+    if space.status == models.StatusEnum.reserved:
+        raise HTTPException(409, "La sala ya está reservada")
+    if space.capacity > 0 and space.occupancy >= space.capacity:
+        raise HTTPException(409, "Sala llena")
+
+    expires = datetime.now(timezone.utc) + timedelta(seconds=RESERVATION_TTL)
+    space.status                 = models.StatusEnum.reserved
+    space.reservation_user_id   = current.id
+    space.reservation_expires_at = expires
+    db.commit()
+    db.refresh(space)
+
+    _cancel_expiry(space_id)
+    _expiry_tasks[space_id] = asyncio.create_task(_expire_reservation(space_id))
+
+    await _broadcast_space(space)
+    return schemas.ReservationOut(
+        space_id=space_id,
+        user_id=current.id,
+        expires_at=expires,
+        message=f"Sala reservada por 5 minutos",
+    )
+
+
+@router.post("/{space_id}/cancel-reserve")
+async def cancel_reserve(
+    space_id: int,
+    db: Session = Depends(get_db),
+    current: models.User = Depends(get_current_user),
+):
+    space = db.get(models.Space, space_id)
+    if not space:
+        raise HTTPException(404, "Espacio no encontrado")
+    if space.status != models.StatusEnum.reserved:
+        raise HTTPException(409, "La sala no está reservada")
+    if space.reservation_user_id != current.id:
+        raise HTTPException(403, "No eres el titular de esta reserva")
+
+    _cancel_expiry(space_id)
+    space.status                 = models.StatusEnum.available
+    space.reservation_user_id   = None
+    space.reservation_expires_at = None
+    db.commit()
+    db.refresh(space)
+    await _broadcast_space(space)
+    return {"detail": "Reserva cancelada"}
+
+
+# ── CHECK-IN ──────────────────────────────────────────────────────────────────
 
 @router.post("/{space_id}/checkin", response_model=schemas.OccupancyOut)
 async def checkin(
@@ -164,11 +269,6 @@ async def checkin(
     db: Session = Depends(get_db),
     current: models.User = Depends(get_current_user),
 ):
-    """
-    Registra la entrada de un usuario al puesto.
-    A partir de este momento comienza a contarse el tiempo de sesión,
-    que determinará el consumo energético estimado del puesto.
-    """
     space = db.get(models.Space, space_id)
     if not space:
         raise HTTPException(404, "Espacio no encontrado")
@@ -176,6 +276,12 @@ async def checkin(
         raise HTTPException(409, "Sala cerrada — acceso no disponible")
     if space.capacity > 0 and space.occupancy >= space.capacity:
         raise HTTPException(409, "Puesto ocupado")
+
+    # ── Regla: un solo puesto activo por profesor en SP1/SP2 ──────────────────
+    zone = db.get(models.Zone, space.zone_id)
+    if zone and _is_profe_zone(zone.code):
+        if _user_has_active_profe_checkin(current.id, db):
+            raise HTTPException(409, "Ya tienes un puesto activo — haz checkout antes de ocupar otro")
 
     existing = (
         db.query(models.Occupancy)
@@ -185,7 +291,6 @@ async def checkin(
     if existing:
         raise HTTPException(409, "Ya tienes check-in activo en este espacio")
 
-    # Crear registro de ocupación — el campo entered_at inicia el cronómetro
     occ = models.Occupancy(user_id=current.id, space_id=space_id)
     db.add(occ)
     space.occupancy = (space.occupancy or 0) + 1
@@ -195,9 +300,11 @@ async def checkin(
     db.refresh(space)
 
     await _broadcast_space(space)
-    await _check_sala_unlock(db)   # ← comprueba si hay que desbloquear SP2
+    await _check_sala_unlock(db)
     return occ
 
+
+# ── CHECK-OUT ─────────────────────────────────────────────────────────────────
 
 @router.post("/{space_id}/checkout", response_model=schemas.OccupancyOut)
 async def checkout(
@@ -205,10 +312,6 @@ async def checkout(
     db: Session = Depends(get_db),
     current: models.User = Depends(get_current_user),
 ):
-    """
-    Registra la salida del usuario.
-    exited_at - entered_at = duración de la sesión → base del cálculo de consumo.
-    """
     occ = (
         db.query(models.Occupancy)
         .filter_by(user_id=current.id, space_id=space_id, active=True)
@@ -228,9 +331,11 @@ async def checkout(
     db.refresh(space)
 
     await _broadcast_space(space)
-    await _check_sala_unlock(db)   # ← comprueba si hay que re-bloquear SP2
+    await _check_sala_unlock(db)
     return occ
 
+
+# ── HISTORIAL ─────────────────────────────────────────────────────────────────
 
 @router.get("/{space_id}/history", response_model=List[schemas.OccupancyOut])
 def occupancy_history(

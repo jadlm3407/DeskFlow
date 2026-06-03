@@ -25,13 +25,8 @@ users = [
         role=models.RoleEnum.admin,
     ),
     models.User(
-        dni="87654321B", nombre="María", apellidos="García",
-        email="maria@espacios.local", hashed_pw=hash_password("pass1234"),
-        role=models.RoleEnum.profesor,
-    ),
-    models.User(
-        dni="11111111C", nombre="Carlos", apellidos="López",
-        email="carlos@espacios.local", hashed_pw=hash_password("pass1234"),
+        dni="34567890B", nombre="Miguel", apellidos="González Rugarcia",
+        email="miguel.gonzalez@espacios.local", hashed_pw=hash_password("pass1234"),
         role=models.RoleEnum.profesor,
     ),
 ]
@@ -136,12 +131,12 @@ db.commit()
 print("✓ Asignaciones de dispositivos insertadas (240 W/puesto × 20 puestos)")
 
 # ── NFC CARDS ──────────────────────────────────────────────────────────────────
-admin_user = db.query(models.User).filter_by(dni="00000001A").first()
-maria_user = db.query(models.User).filter_by(dni="87654321B").first()
+admin_user  = db.query(models.User).filter_by(dni="00000001A").first()
+miguel_user = db.query(models.User).filter_by(dni="34567890B").first()
 
 nfc_cards = [
-    models.NfcCard(uid="04:FC:B2:40:BC:2A:81", user_id=admin_user.id, label="Tarjeta admin"),
-    models.NfcCard(uid="04:FD:B2:40:BC:2A:81", user_id=maria_user.id, label="Tarjeta María"),
+    models.NfcCard(uid="04:FC:B2:40:BC:2A:81", user_id=admin_user.id,  label="Tarjeta admin"),
+    models.NfcCard(uid="04:FD:B2:40:BC:2A:81", user_id=miguel_user.id, label="Tarjeta Miguel"),
 ]
 for card in nfc_cards:
     if not db.query(models.NfcCard).filter_by(uid=card.uid).first():
@@ -153,9 +148,8 @@ db.close()
 print()
 print("═══════════════════════════════════════════════")
 print("  ✓ Seed completado")
-print("  admin : DNI=00000001A  pass=admin1234")
-print("  prof1 : DNI=87654321B  pass=pass1234")
-print("  prof2 : DNI=11111111C  pass=pass1234")
+print("  admin  : DNI=00000001A  pass=admin1234")
+print("  miguel : DNI=34567890B  pass=pass1234")
 print("═══════════════════════════════════════════════")
 print()
 print("  Consumo por puesto  : 240 W (PC 200W + Monitor 30W + Lámpara 10W)")
