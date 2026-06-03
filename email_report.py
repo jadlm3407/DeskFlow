@@ -17,8 +17,8 @@ from email.mime.text import MIMEText
 from datetime import datetime
 
 # ── Configuración Gmail ───────────────────────────────────────────────────────
-GMAIL_USER     = "peihaosun2007@gmail.com"
-GMAIL_PASSWORD = "npii mysb ujgp imxj"
+GMAIL_USER     = "deskflow.espacios@gmail.com"
+GMAIL_PASSWORD = "roqm yius qrnx jkyv"
 EMAIL_DESTINO  = "peihaosun2007@gmail.com"
 
 # ── Constantes descriptivas (sincronizadas con energy.py) ─────────────────────
