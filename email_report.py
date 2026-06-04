@@ -10,7 +10,7 @@ from datetime import datetime
 # ── Configuración Gmail ───────────────────────────────────────────────────────
 GMAIL_USER     = "deskflow.espacios@gmail.com"
 GMAIL_PASSWORD = "roqm yius qrnx jkyv"
-EMAIL_DESTINO_DEFAULT = "peihaosun2007@gmail.com"
+EMAIL_DESTINO_DEFAULT = "carlos.moreno@universidadeuropea.es"
 
 # ── Constantes descriptivas ───────────────────────────────────────────────────
 SALA_DEVICE_DESC        = "AC 1 500 W + 8 tubos LED 40 W = 1 820 W"

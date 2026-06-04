@@ -517,7 +517,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
                 </div>
                 <div class="form-row" style="margin-bottom:16px;">
                   <label class="form-label">Destinatario</label>
-                  <input class="form-input" id="report-email" value="peihaosun2007@gmail.com" placeholder="destinatario@email.com">
+                  <input class="form-input" id="report-email" value="carlos.moreno@universidadeuropea.es" placeholder="destinatario@email.com">
                 </div>
                 <button class="btn-send-report" id="btn-send-report" onclick="enviarInforme()">📧 Enviar informe ahora</button>
                 <div class="form-msg" id="report-msg"></div>
@@ -656,7 +656,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 </div>
 
 <script>
-const API='http://localhost:8000', WS_URL='ws://localhost:8000/ws';
+const API='http://172.20.10.13:8000', WS_URL='ws://172.20.10.13:8000/ws';
 let token=null,currentUser=null,sessionStart=null,sessionIv=null,ws=null,pollingIv=null;
 let spacesCache={},zonesCache={},modalSpaceId=null,openZoneId=null,liveEvents=[];
 let currentView='salas', reportPeriod='week';
@@ -741,7 +741,11 @@ async function apiFetch(path,opts={}){
   const h={'Content-Type':'application/json',...(opts.headers||{})};
   if(token)h['Authorization']=`Bearer ${token}`;
   const r=await fetch(`${API}${path}`,{...opts,headers:h});
-  if(!r.ok){const e=await r.json().catch(()=>({detail:r.statusText}));throw new Error(e.detail);}
+  if(!r.ok){
+    let msg=r.statusText;
+    try{const e=await r.json();msg=typeof e.detail==='string'?e.detail:Array.isArray(e.detail)?e.detail.map(x=>x.msg||JSON.stringify(x)).join(', '):JSON.stringify(e.detail);}catch(_){}
+    throw new Error(msg);
+  }
   return r.json();
 }
 
@@ -781,7 +785,6 @@ function switchView(v){
   } else {
     $$('zone-grid').classList.add('hide');
     $$('admin-panel').classList.add('show');
-    // Solo cargar datos admin si spacesCache ya está listo
     if(Object.keys(spacesCache).length>0){
       loadUsers();loadHistorial();loadUsersForNfc();
     } else {
@@ -975,7 +978,7 @@ async function crearUsuario(){
     showFormMsg('nu-msg','✓ Usuario creado correctamente','ok');
     $$('nu-nombre').value='';$$('nu-apellidos').value='';$$('nu-dni').value='';$$('nu-email').value='';$$('nu-pass').value='';
     loadUsers();loadUsersForNfc();
-  }catch(e){showFormMsg('nu-msg',e.message,'err');}
+  }catch(e){showFormMsg('nu-msg', typeof e.message==='string'?e.message:JSON.stringify(e),'err');}
 }
 
 /* Tabla usuarios */
